@@ -100,12 +100,12 @@ If you made it here you should be all set :rocket:
 </details>
 
 ## Slot 1
-Hands-on I
+**Julia and HPC**
 ## Slot 2
-Hands-on I
+**Hands-on I**
 
 ## Slot 3
-Hands-on II
+**Hands-on II**
 
 ## Slot 4
-OPTION 1
+**OPTION 1**
