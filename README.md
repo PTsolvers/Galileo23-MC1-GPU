@@ -23,13 +23,19 @@ _by Ludovic Räss and Ivan Utkin (ETH Zurich)_
 ## Getting started
 This section provides directions on getting your GPU HPC dev environment ready on the `octopus` supercomputer at the University of Lausanne, Switzerland. During tthis Master-class, we will use SSH to login to a remote multi-GPU compute node on `octopus`. Each of the participant should get access to 4 Nvidia Titan Xm 12GB. 
 
+> ⚠️ It is warmly recommended trying to perform the Getting started steps before the beginning of the workshop.
+
+<details>
+<summary>CLICK HERE for the getting started steps 🚀</summary>
+<br>
+
 In the following, we will give directions on how to use [VSCode](https://code.visualstudio.com) and the [Remote-SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) extension to access the compute resources. However, feel free to access the resources using your preferred SSH setup.
 
 1. Download [VSCode](https://code.visualstudio.com/download) on your laptop.
 2. Install the [Remote-SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) and [Julia](https://marketplace.visualstudio.com/items?itemName=julialang.language-julia) extensions.
 3. Retrieve your **confidential** login credentials from the email you received titled "MC1 login credentials".
-4. Setup a password-less SSH config to access `octopus` (see e.g. [here]() on "how-to").
-5. [Edit the SSH config file]() to add the infos about `octopus` login (replacing `XX` with the number you got assigned - note the node number should be `node0X` for `X<10`):
+4. Setup a password-less SSH config to access `octopus` (see e.g. [here](https://linuxize.com/post/how-to-setup-passwordless-ssh-login/) on "how-to").
+5. [Edit the SSH config file](https://code.visualstudio.com/blogs/2019/10/03/remote-ssh-tips-and-tricks#_ssh-configuration-file) to add the infos about `octopus` login (replacing `XX` with the number you got assigned - note the node number should be `node0X` for `X<10`):
     ```
     Host octo-login
       HostName achsrv0.unil.ch
@@ -89,10 +95,17 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
     mpirun -np 4 -mca btl_openib_warn_default_gid_prefix 0 julia --project alltoall_mpi_gpu.jl
     ```
 If you made it here you should be all set :rocket:
-## Slot 1
 
+<br>
+</details>
+
+## Slot 1
+Hands-on I
 ## Slot 2
+Hands-on I
 
 ## Slot 3
+Hands-on II
 
 ## Slot 4
+OPTION 1
