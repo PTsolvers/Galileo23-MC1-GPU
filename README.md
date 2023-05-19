@@ -23,11 +23,11 @@ _by Ludovic Räss and Ivan Utkin (ETH Zurich)_
 ## Getting started
 This section provides directions on getting your GPU HPC dev environment ready on the `octopus` supercomputer at the University of Lausanne, Switzerland. During tthis Master-class, we will use SSH to login to a remote multi-GPU compute node on `octopus`. Each of the participant should get access to 4 Nvidia Titan Xm 12GB. 
 
-In the following, we will give directions on how to use [VSCode](https://code.visualstudio.com) and the [Remote-SSH]() extension to access the compute resources. However, feel free to access the resources using your preferred SSH setup.
+In the following, we will give directions on how to use [VSCode](https://code.visualstudio.com) and the [Remote-SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) extension to access the compute resources. However, feel free to access the resources using your preferred SSH setup.
 
 1. Download [VSCode](https://code.visualstudio.com/download) on your laptop.
 2. Install the [Remote-SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) and [Julia](https://marketplace.visualstudio.com/items?itemName=julialang.language-julia) extensions.
-3. Retrieve your **confidential** login credentials from the email you received titled "MC1 octopus login credentials".
+3. Retrieve your **confidential** login credentials from the email you received titled "MC1 login credentials".
 4. Setup a password-less SSH config to access `octopus`. See e.g. [here on "how-to"]().
 5. [Edit the SSH config file]() to add the infos about `octopus` login (replacing `XX` with the number you got assigned - note the node number should be `node0X` for `X<10`):
     ```
@@ -75,6 +75,18 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
     
     julia> MPI.MPI_LIBRARY_VERSION_STRING
     "Open MPI v3.1.4, package: Open MPI root@node01.octopoda Distribution, ident: 3.1.4, repo rev: v3.1.4, Apr 15, 2019\0"
+    ```
+10. Finally, you should be able to run the following scripts to make sure MPI-based GPU selection and GPU-aware MPI is running as expected in Julia. Exit Julia and go to the `scripts_start` folder:
+    ```
+    cd scripts_start
+    ```
+    Then run the [`hello_mpi_gpu.jl`](scripts_start/hello_mpi_gpu.jl) script to make sure GPU selection works as expected:
+    ```
+    mpirun -np 4 -mca btl_openib_warn_default_gid_prefix 0 julia --project hello_mpi_gpu.jl
+    ```
+    and the [`alltoall_mpi_gpu.jl`](scripts_start/alltoall_mpi_gpu.jl) script to verify GPU-aware MPI is working:
+    ```
+    mpirun -np 4 -mca btl_openib_warn_default_gid_prefix 0 julia --project alltoall_mpi_gpu.jl
     ```
 ## Slot 1
 
