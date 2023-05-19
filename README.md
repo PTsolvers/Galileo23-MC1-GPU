@@ -95,7 +95,6 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
     mpirun -np 4 -mca btl_openib_warn_default_gid_prefix 0 julia --project alltoall_mpi_gpu.jl
     ```
 If you made it here you should be all set :rocket:
-
 <br>
 </details>
 
