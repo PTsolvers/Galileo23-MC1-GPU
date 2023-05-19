@@ -8,9 +8,9 @@ _by Ludovic Räss and Ivan Utkin (ETH Zurich)_
 ## Program
 | Slot    | Program |
 | :-----  | :----- |
-| [Slot 1](#slot-1)  | **Introduction** about GPU HPC<br>- Student short presentation (5 min each) <br>- Getting set-up with GPU node access on `octopus`<br>- Brief intro about Julia for HPC |
+| [Slot 1](#slot-1)  | **Introduction** about GPU HPC<br>- Student short presentation (5 min each) <br>- [Getting started](#getting-started) with GPU node access on `octopus`<br>- Brief intro about Julia for HPC |
 | [Slot 2](#slot-2) | **Hands-on I**<br>- GPU computing and HPC<br>- Julia GPU and MPI stack<br>- Model design and implementation: Stokes flow in a channel |
-| [Slot 3](#slot-3) | **Hands-on II**<br>- Mulit-GPU computing<br>- Performance limiters<br>- Performance measure $T_\mathrm{eff}$ |
+| [Slot 3](#slot-3) | **Hands-on II**<br>- Multi-GPU computing<br>- Performance limiters<br>- Performance measure $T_\mathrm{eff}$ |
 | [Slot 4](#slot-4) | **OPTION 1 - Towards scalable inverse modelling**<br>- AD (GPU) tools in Julia<br>- Jacbian-vector product (JVP) computation in a multi-GPU model<br>- _Advanced: towards sensitivity kernels and adjoint solutions_<br> **Wrap-up discussion** |
 
 ## Content
@@ -28,7 +28,7 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
 1. Download [VSCode](https://code.visualstudio.com/download) on your laptop.
 2. Install the [Remote-SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) and [Julia](https://marketplace.visualstudio.com/items?itemName=julialang.language-julia) extensions.
 3. Retrieve your **confidential** login credentials from the email you received titled "MC1 login credentials".
-4. Setup a password-less SSH config to access `octopus`. See e.g. [here on "how-to"]().
+4. Setup a password-less SSH config to access `octopus` (see e.g. [here]() on "how-to").
 5. [Edit the SSH config file]() to add the infos about `octopus` login (replacing `XX` with the number you got assigned - note the node number should be `node0X` for `X<10`):
     ```
     Host octo-login
@@ -80,14 +80,15 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
     ```
     cd scripts_start
     ```
-    Then run the [`hello_mpi_gpu.jl`](scripts_start/hello_mpi_gpu.jl) script to make sure GPU selection works as expected:
+    Run the [`hello_mpi_gpu.jl`](scripts_start/hello_mpi_gpu.jl) script to make sure GPU selection works as expected:
     ```
     mpirun -np 4 -mca btl_openib_warn_default_gid_prefix 0 julia --project hello_mpi_gpu.jl
     ```
-    and the [`alltoall_mpi_gpu.jl`](scripts_start/alltoall_mpi_gpu.jl) script to verify GPU-aware MPI is working:
+    Run the [`alltoall_mpi_gpu.jl`](scripts_start/alltoall_mpi_gpu.jl) script to verify GPU-aware MPI is working:
     ```
     mpirun -np 4 -mca btl_openib_warn_default_gid_prefix 0 julia --project alltoall_mpi_gpu.jl
     ```
+If you made it here you should be all set :rocket:
 ## Slot 1
 
 ## Slot 2
