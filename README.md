@@ -1,8 +1,8 @@
 # Galileo23-MC1-GPU
-Master class on GPU HPC for the exascale era in geosciences
 
 [**Solid Earth and Geohazards in the Exascale Era** | BARCELONA | SPAIN | 23–26 MAY 2023](https://egu-galileo.eu/gc11-solidearth/)
 
+Master class on GPU HPC for the exascale era in geosciences
 
 ## Program
 | Slot    | Program |
