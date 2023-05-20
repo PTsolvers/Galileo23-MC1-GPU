@@ -21,7 +21,7 @@ _by Ludovic Räss and Ivan Utkin (ETH Zurich)_
 
 ## Slot 1
 ### Getting started
-This section provides directions on getting your GPU HPC dev environment ready on the `octopus` supercomputer at the University of Lausanne, Switzerland. During tthis Master-class, we will use SSH to login to a remote multi-GPU compute node on `octopus`. Each of the participant should get access to 4 Nvidia Titan Xm 12GB. 
+This section provides directions on getting your GPU HPC dev environment ready on the `octopus` supercomputer at the University of Lausanne, Switzerland. During this Master-class, we will use SSH to login to a remote multi-GPU compute node on `octopus`. Each of the participant should get access to 4 Nvidia Titan Xm 12GB. 
 
 > ⚠️ It is warmly recommended trying to perform the Getting started steps before the beginning of the workshop.
 
@@ -33,18 +33,18 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
 
 1. Download [VSCode](https://code.visualstudio.com/download) on your laptop.
 2. Install the [Remote-SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) and [Julia](https://marketplace.visualstudio.com/items?itemName=julialang.language-julia) extensions.
-3. Retrieve your **confidential** login credentials from the email you received titled "MC1 login credentials".
-4. Setup a password-less SSH config to access `octopus` (see e.g. [here](https://linuxize.com/post/how-to-setup-passwordless-ssh-login/) on "how-to").
-5. [Edit the SSH config file](https://code.visualstudio.com/blogs/2019/10/03/remote-ssh-tips-and-tricks#_ssh-configuration-file) to add the infos about `octopus` login (replacing `XX` with the number you got assigned - note the node number should be `node0X` for `X<10`):
+3. Retrieve your **confidential** login credentials from the email you received titled "MC1 login credentials", namely your username `<username>` (in the format `courseXX`) and dedicated compute node ID `<nodeID>` (in the format `nodeXX`).
+4. Setup a password-less SSH config to access `octopus` (see e.g. [here](https://linuxize.com/post/how-to-setup-passwordless-ssh-login/) on "how-to"). Ideally, use `ed25519` encryption.
+5. [Edit the SSH config file](https://code.visualstudio.com/blogs/2019/10/03/remote-ssh-tips-and-tricks#_ssh-configuration-file) to add the infos about `octopus` login (replacing `<username>` with the username you got assigned - note the node ID should always be a 2 digit number):
     ```
     Host octo-login
       HostName achsrv0.unil.ch
-      User courseXX
+      User <username>
       IdentityFile ~/.ssh/id_ed25519
 
-    Host nodeXX
-      HostName nodeXX.octopoda
-      User courseXX
+    Host node<nodeID>
+      HostName node<nodeID>.octopoda
+      User <username>
       ProxyJump octo-login
     ```
 6. Connect to your assigned node, check you are in your home folder (using `pwd`) and clone this repo into your home:
@@ -114,6 +114,11 @@ export JULIA_CUDA_MEMORY_POOL=none
 ```
 <br>
 </details>
+
+### Useful resources
+- PDE on GPUs ETH Zurich course
+- Julia Discourse (Julia Q&A)
+- Julia Slack (Julia dev chat)
 
 ### Julia and HPC
 Some words on the Julia at scale effort, the Julia HPC packages, and why Julia for HPC in general (two language barrier)
