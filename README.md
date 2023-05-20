@@ -95,6 +95,20 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
     mpirun -np 4 -mca btl_openib_warn_default_gid_prefix 0 julia --project alltoall_mpi_gpu.jl
     ```
 If you made it here you should be all set :rocket:
+
+#### The small print
+Note that the following config is already set in your `.bashrc` to prepare the correct environment:
+```sh
+# User specific aliases and functions
+# load modules
+module load julia cuda/11.4 openmpi/gcc83-314-c112
+# Julia setup
+alias juliap='julia --project'
+# new Preferences.jl based config
+export JULIA_LOAD_PATH="$JULIA_LOAD_PATH:/soft/julia/julia_prefs/"
+export JULIA_CUDA_MEMORY_POOL=none
+```
+
 <br>
 </details>
 
