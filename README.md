@@ -116,20 +116,21 @@ export JULIA_CUDA_MEMORY_POOL=none
 </details>
 
 ### Useful resources
-- PDE on GPUs ETH Zurich course
-- Julia Discourse (Julia Q&A)
-- Julia Slack (Julia dev chat)
+- The Julia language: [https://julialang.org](https://julialang.org)
+- PDE on GPUs ETH Zurich course: [https://pde-on-gpu.vaw.ethz.ch](https://pde-on-gpu.vaw.ethz.ch)
+- Julia Discourse (Julia Q&A): [https://discourse.julialang.org](https://discourse.julialang.org)
+- Julia Slack (Julia dev chat): [https://julialang.org/slack/](https://julialang.org/slack/)
 
 ### Julia and HPC
 Some words on the Julia at scale effort, the Julia HPC packages, and why Julia for HPC in general (two language barrier)
 ## Slot 2
 **Hands-on I**
 
-### Solving the transient 2D diffusion on the CPU I
+### Solving transient 2D diffusion on the CPU I
 
-### Solving the transient 2D diffusion on the CPU II
+### Solving  transient 2D diffusion on the CPU II
 
-### Solving the transient 2D diffusion on GPU
+### Solving  transient 2D diffusion on GPU
 
 ### Channel flow in 2D
 ## Slot 3
