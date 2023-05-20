@@ -140,7 +140,6 @@ Too good to be true? Hold on 🙂 ...
 ![Frontier](./docs/frontier.png)
 
 #### Performance that matters
-
 ![cpu_gpu_evo](./docs/cpu_gpu_evo.png)
 
 Taking a look at a recent GPU and CPU:
@@ -169,7 +168,6 @@ consists of:
 👉 assuming $D$, $∂x$ are scalars, $q$ and $A$ are arrays of `Float64` (read from main memory)
 
 #### Performance that matters - an example
-
 Not yet convinced? Let's have a look at an example.
 
 Let's assess how close from memory copy (1355 GB/s) we can get solving a 2D diffusion problem on an Nvidia Tesla A100 GPU.
@@ -177,6 +175,14 @@ Let's assess how close from memory copy (1355 GB/s) we can get solving a 2D diff
 $$ ∇⋅(D ∇ C) = \frac{∂C}{∂t} $$
 
 👉 Let's test the performance using a simple [perftest.jl](scripts_s1/perftest.jl) script.
+
+#### Why to still bother with GPU computing in 2022
+Because it is still challenging
+
+Why?
+- Very few software uses it efficiently
+- It requires to rethink the solving strategy as non-local operations will kill the fun
+
 ## Slot 2
 **Hands-on I**
 ### Solving transient 2D diffusion on the CPU I
