@@ -108,7 +108,6 @@ alias juliap='julia --project'
 export JULIA_LOAD_PATH="$JULIA_LOAD_PATH:/soft/julia/julia_prefs/"
 export JULIA_CUDA_MEMORY_POOL=none
 ```
-
 <br>
 </details>
 
