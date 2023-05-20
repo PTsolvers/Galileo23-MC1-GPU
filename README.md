@@ -11,16 +11,16 @@ _by Ludovic Räss and Ivan Utkin (ETH Zurich)_
 | [Slot 1](#slot-1)  | **Introduction** about GPU HPC<br>- Student short presentation (5 min each) <br>- [Getting started](#getting-started) with GPU node access on `octopus`<br>- Brief intro about Julia for HPC |
 | [Slot 2](#slot-2) | **Hands-on I**<br>- GPU computing and HPC<br>- Julia GPU and MPI stack<br>- Model design and implementation: Stokes flow in a channel |
 | [Slot 3](#slot-3) | **Hands-on II**<br>- Multi-GPU computing<br>- Performance limiters<br>- Performance measure $T_\mathrm{eff}$ |
-| [Slot 4](#slot-4) | **OPTION 1 - Towards scalable inverse modelling**<br>- AD (GPU) tools in Julia<br>- Jacbian-vector product (JVP) computation in a multi-GPU model<br>- _Advanced: towards sensitivity kernels and adjoint solutions_<br> **Wrap-up discussion** |
+| [Slot 4](#slot-4) | **OPTION 1 - Towards scalable inverse modelling**<br>- AD (GPU) tools in Julia<br>- Jacbian-vector product (JVP) computation in a multi-GPU model<br><br>- _Advanced 1: towards sensitivity kernels and adjoint solutions_<br>- _Advanced 2: the accelerated pseudo-transient method_<br><br>  **Wrap-up discussion** |
 
 ## Content
-- [Getting started](#getting-started)
 - [Slot 1 - Intro](#slot-1)
 - [Slot 2 - Hands-on I](#slot-2)
 - [Slot 3 - Hands-on II](#slot-3)
 - [Slot 4 - OPTION 1](#slot-4)
 
-## Getting started
+## Slot 1
+### Getting started
 This section provides directions on getting your GPU HPC dev environment ready on the `octopus` supercomputer at the University of Lausanne, Switzerland. During tthis Master-class, we will use SSH to login to a remote multi-GPU compute node on `octopus`. Each of the participant should get access to 4 Nvidia Titan Xm 12GB. 
 
 > ⚠️ It is warmly recommended trying to perform the Getting started steps before the beginning of the workshop.
@@ -82,7 +82,9 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
     julia> MPI.MPI_LIBRARY_VERSION_STRING
     "Open MPI v3.1.4, package: Open MPI root@node01.octopoda Distribution, ident: 3.1.4, repo rev: v3.1.4, Apr 15, 2019\0"
     ```
-10. Finally, you should be able to run the following scripts to make sure MPI-based GPU selection and GPU-aware MPI is running as expected in Julia. Exit Julia and go to the [scripts_start](scripts_start) folder:
+10. Let's try now to run some basic plotting scripts within Julia and get the output inlined to VSCode. In the [scripts_start](scripts_start) folder, run the [visu_2D.jl](scripts_start/visu_2D.jl) script which should produce a heatmap of a Gaussian distribution in 2D.
+
+11. Finally, you should at this stage be able to run the following scripts to make sure MPI-based GPU selection and GPU-aware MPI is running as expected in Julia. Exit Julia and go to the [scripts_start](scripts_start) folder:
     ```
     cd scripts_start
     ```
@@ -94,6 +96,8 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
     ```
     mpirun -np 4 -mca btl_openib_warn_default_gid_prefix 0 julia --project alltoall_mpi_gpu.jl
     ```
+
+
 If you made it here you should be all set :rocket:
 
 #### The small print
@@ -111,13 +115,32 @@ export JULIA_CUDA_MEMORY_POOL=none
 <br>
 </details>
 
-## Slot 1
-**Julia and HPC**
+### Julia and HPC
+Some words on the Julia at scale effort, the Julia HPC packages, and why Julia for HPC in general (two language barrier)
 ## Slot 2
 **Hands-on I**
 
+### Solving the transient 2D diffusion on the CPU I
+
+### Solving the transient 2D diffusion on the CPU II
+
+### Solving the transient 2D diffusion on GPU
+
+### Channel flow in 2D
 ## Slot 3
 **Hands-on II**
+### Multi-CPU diffusion solver
 
+### Multi-GPU diffusion solver
+
+### Multi-GPU channel flow
 ## Slot 4
 **OPTION 1**
+### AD tools in Julia
+
+### JVP calculations
+
+### Advanced
+#### Towards sensitivity kernels and adjoint solutions
+
+#### The accelerated pseudo-transient method
