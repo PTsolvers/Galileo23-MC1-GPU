@@ -60,7 +60,7 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
     ```julia-repl
     (@v1.9) pkg> activate .
     
-    (@Galileo23-MC1-GPU) pkg> resolve
+    (@Galileo23-MC1-GPU) pkg> instantiate
     ```
 9. To make sure you are all set, check your CUDA and MPI install:
     ```julia-repl
