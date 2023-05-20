@@ -82,15 +82,15 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
     julia> MPI.MPI_LIBRARY_VERSION_STRING
     "Open MPI v3.1.4, package: Open MPI root@node01.octopoda Distribution, ident: 3.1.4, repo rev: v3.1.4, Apr 15, 2019\0"
     ```
-10. Finally, you should be able to run the following scripts to make sure MPI-based GPU selection and GPU-aware MPI is running as expected in Julia. Exit Julia and go to the `scripts_start` folder:
+10. Finally, you should be able to run the following scripts to make sure MPI-based GPU selection and GPU-aware MPI is running as expected in Julia. Exit Julia and go to the [scripts_start](scripts_start) folder:
     ```
     cd scripts_start
     ```
-    Run the [`hello_mpi_gpu.jl`](scripts_start/hello_mpi_gpu.jl) script to make sure GPU selection works as expected:
+    Run the [hello_mpi_gpu.jl](scripts_start/hello_mpi_gpu.jl) script to make sure GPU selection works as expected:
     ```
     mpirun -np 4 -mca btl_openib_warn_default_gid_prefix 0 julia --project hello_mpi_gpu.jl
     ```
-    Run the [`alltoall_mpi_gpu.jl`](scripts_start/alltoall_mpi_gpu.jl) script to verify GPU-aware MPI is working:
+    Run the [alltoall_mpi_gpu.jl](scripts_start/alltoall_mpi_gpu.jl) script to verify GPU-aware MPI is working:
     ```
     mpirun -np 4 -mca btl_openib_warn_default_gid_prefix 0 julia --project alltoall_mpi_gpu.jl
     ```
