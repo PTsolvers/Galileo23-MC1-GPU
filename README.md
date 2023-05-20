@@ -200,7 +200,7 @@ The diffusion coefficient $D = d_0$ should be defined in all gird points such th
 ```julia
 D = d0 .* ones(...)
 ```
-> :bulb: If you struggle getting started, check-out the [scripts_s2/diffusion_2D.jl](scripts_s2/diffusion_2D.jl) script.
+> :bulb: If you struggle getting started, check-out the [scripts_s2/diffusion_2D.jl](scripts_s2/diffusion_2D.jl) script and try replacing the `??` by some more valid content.
 
 ### Solving  transient 2D diffusion on the CPU II
 
