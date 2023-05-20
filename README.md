@@ -159,7 +159,7 @@ Floating point operations are "for free" when we work in memory-bounded regimes.
 
 Unfortunately, the cost of evaluating a first derivative $∂A / ∂x$ using finite-differences:
 ```julia
-q[ix] = -D*(A[ix+1]-A[ix])/dx
+q[ix] = -D * (A[ix+1] - A[ix]) / dx
 ```
 consists of:
 - 1 reads + 1 write => $2 × 8$ = **16 Bytes transferred**
