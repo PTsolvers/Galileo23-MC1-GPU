@@ -82,17 +82,17 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
     julia> MPI.MPI_LIBRARY_VERSION_STRING
     "Open MPI v3.1.4, package: Open MPI root@node01.octopoda Distribution, ident: 3.1.4, repo rev: v3.1.4, Apr 15, 2019\0"
     ```
-10. Let's try now to run some basic plotting scripts within Julia and get the output inlined to VSCode. In the [scripts_start](scripts_start) folder, run the [visu_2D.jl](scripts_start/visu_2D.jl) script which should produce a heatmap of a Gaussian distribution in 2D.
+10. Let's try now to run some basic plotting scripts within Julia and get the output inlined to VSCode. In the [scripts_start](scripts_start) folder, run the [scripts_start/visu_2D.jl](scripts_start/visu_2D.jl) script which should produce a heatmap of a Gaussian distribution in 2D.
 
 11. Finally, you should at this stage be able to run the following scripts to make sure MPI-based GPU selection and GPU-aware MPI is running as expected in Julia. Exit Julia and go to the [scripts_start](scripts_start) folder:
     ```
     cd scripts_start
     ```
-    Run the [hello_mpi_gpu.jl](scripts_start/hello_mpi_gpu.jl) script to make sure GPU selection works as expected:
+    Run the [scripts_start/hello_mpi_gpu.jl](scripts_start/hello_mpi_gpu.jl) script to make sure GPU selection works as expected:
     ```
     mpirun -np 4 -mca btl_openib_warn_default_gid_prefix 0 julia --project hello_mpi_gpu.jl
     ```
-    Run the [alltoall_mpi_gpu.jl](scripts_start/alltoall_mpi_gpu.jl) script to verify GPU-aware MPI is working:
+    Run the [scripts_start/alltoall_mpi_gpu.jl](scripts_start/alltoall_mpi_gpu.jl) script to verify GPU-aware MPI is working:
     ```
     mpirun -np 4 -mca btl_openib_warn_default_gid_prefix 0 julia --project alltoall_mpi_gpu.jl
     ```
@@ -174,7 +174,7 @@ Let's assess how close from memory copy (1355 GB/s) we can get solving a 2D diff
 
 $$ ∇⋅(D ∇ C) = \frac{∂C}{∂t} $$
 
-👉 Let's test the performance using a simple [perftest.jl](scripts_s1/perftest.jl) script.
+👉 Let's test the performance using a simple [scripts_s1/perftest.jl](scripts_s1/perftest.jl) script.
 
 #### Why to still bother with GPU computing in 2022
 Because it is still challenging
@@ -185,13 +185,29 @@ Why?
 
 ## Slot 2
 **Hands-on I**
+Now it's time to get started. In the coming 2 hours, we will program a 2D transientdiffusion equation in a vectorised fashion in Julia. Then, we will turn it into a multi-threaded loop version, and finally into a GPU code. The last part will consist of modifying the diffusion code to solve the channel flow in 2D with free-surface and variable viscosity.
+
 ### Solving transient 2D diffusion on the CPU I
+Starting from the [scripts_start/visu_2D.jl](scripts_start/visu_2D.jl) script, we will add diffusion physics:
+$$ \frac{∂C}{∂t} = ∇⋅q~, $$
+
+$$ q = D~∇C ~,$$
+where $D$ is the diffusion coefficient.
+
+Let's use a simple explicit forward Euler time-stepping scheme and keepthe same Gaussian distribution as initial condition.
+
+The diffusion coefficient $D = d_0$ should be defined in all gird points such that it could be spatially variable in a later stage:
+```julia
+D = d0 .* ones(...)
+```
+> :bulb: If you struggle getting started, check-out the [scripts_s2/diffusion_2D.jl](scripts_s2/diffusion_2D.jl) script.
 
 ### Solving  transient 2D diffusion on the CPU II
 
 ### Solving  transient 2D diffusion on GPU
 
 ### Channel flow in 2D
+
 ## Slot 3
 **Hands-on II**
 ### Multi-CPU diffusion solver
