@@ -122,10 +122,9 @@ export JULIA_CUDA_MEMORY_POOL=none
 - Julia Slack (Julia dev chat): [https://julialang.org/slack/](https://julialang.org/slack/)
 
 ### Julia and HPC
-Some words on the Julia at scale effort, the Julia HPC packages, and why Julia for HPC in general (two language barrier)
+Some words on the Julia at scale effort, the Julia HPC packages, and the overall Julia for HPC motivation (two language barrier)
 ## Slot 2
 **Hands-on I**
-
 ### Solving transient 2D diffusion on the CPU I
 
 ### Solving  transient 2D diffusion on the CPU II
