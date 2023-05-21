@@ -19,7 +19,7 @@ using Plots.PlotMeasures
     # preprocessing
     dy, dz  = ly / ny, lz / nz
     yc, zc  = LinRange(-ly / 2 + dy / 2, ly / 2 - dy / 2, ny), LinRange(dz / 2, lz - dz / 2, nz)
-    vdτ     = cfl * min(dy, dz)^2
+    dτ      = cfl * min(dy, dz)^2
     # init
     C       = @. exp(-yc^2 / 0.02 - (zc' - lz / 2)^2 / 0.02)
     D       = d0 .* ones(??)
