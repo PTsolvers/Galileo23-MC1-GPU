@@ -32,7 +32,7 @@ This section provides directions on getting your GPU HPC dev environment ready o
 In the following, we will give directions on how to use [VSCode](https://code.visualstudio.com) and the [Remote-SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) extension to access the compute resources. However, feel free to access the resources using your preferred SSH setup.
 
 1. Download [VSCode](https://code.visualstudio.com/download) on your laptop.
-2. Install the [Remote-SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) and [Julia](https://marketplace.visualstudio.com/items?itemName=julialang.language-julia) extensions.
+2. Install the [Remote-SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) and [Julia](https://marketplace.visualstudio.com/items?itemName=julialang.language-julia) extensions by clicking the `Extensions` button on the left side of VSCode.
 3. Retrieve your **confidential** login credentials from the email you received titled "MC1 login credentials", namely your username `<username>` (in the format `courseXX`) and dedicated compute node ID `<nodeID>` (in the format `nodeXX`).
 4. Setup a password-less SSH config to access `octopus` (see e.g. [here](https://linuxize.com/post/how-to-setup-passwordless-ssh-login/) on "how-to"). Ideally, use `ed25519` encryption.
 5. [Edit the SSH config file](https://code.visualstudio.com/blogs/2019/10/03/remote-ssh-tips-and-tricks#_ssh-configuration-file) to add the infos about `octopus` login (replacing `<username>` with the username you got assigned - note the node ID should always be a 2 digit number):
@@ -51,6 +51,10 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
     ```
     git clone https://github.com/PTsolvers/Galileo23-MC1-GPU.git
     ```
+    Move to the directory:
+    ```
+    $cd Galileo23-MC1-GPU
+    ```
 7. Load the Julia, CUDA and MPI modules:
     ```
     module load julia cuda/11.4 openmpi/gcc83-314-c112
@@ -64,7 +68,7 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
     ```
 9. To make sure you are all set, check your CUDA and MPI install:
     ```julia-repl
-    julia> using CUDA
+    julia> using CUDA, MPI
 
     julia> CUDA.versioninfo()
     CUDA runtime 11.2, local installation
@@ -82,9 +86,17 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
     julia> MPI.MPI_LIBRARY_VERSION_STRING
     "Open MPI v3.1.4, package: Open MPI root@node01.octopoda Distribution, ident: 3.1.4, repo rev: v3.1.4, Apr 15, 2019\0"
     ```
-10. Let's try now to run some basic plotting scripts within Julia and get the output inlined to VSCode. In the [scripts_start](scripts_start) folder, run the [scripts_start/visu_2D.jl](scripts_start/visu_2D.jl) script which should produce a heatmap of a Gaussian distribution in 2D.
-
-11. Finally, you should at this stage be able to run the following scripts to make sure MPI-based GPU selection and GPU-aware MPI is running as expected in Julia. Exit Julia and go to the [scripts_start](scripts_start) folder:
+10. Let's try now to run some basic plotting scripts within Julia and get the output inlined to VSCode. For this, you need to install the [Julia](https://marketplace.visualstudio.com/items?itemName=julialang.language-julia) extension on the node (as you did already on your laptop) and start julia using the `Command Palette` of VSCode (`>Julia: Start REPL`). Change to the correct directory using the shell mode of julia:
+    ```julia-repl
+      shell> cd Galileo23-MC1-GPU/scripts_start/
+      /home/course11/Galileo23-MC1-GPU/scripts_start
+    ```
+    In the [scripts_start](scripts_start) folder, run the [scripts_start/visu_2D.jl](scripts_start/visu_2D.jl) script with:
+    ```julia-repl
+      julia> include("visu_2D.jl")
+    ```
+    which should produce a heatmap of a Gaussian distribution in 2D.
+11.  Finally, you should at this stage be able to run the following scripts to make sure MPI-based GPU selection and GPU-aware MPI is running as expected in Julia. Exit Julia and go to the [scripts_start](scripts_start) folder:
     ```
     cd scripts_start
     ```
