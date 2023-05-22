@@ -272,6 +272,14 @@ Finally, one needs to gather back on the host the `C` array for plotting, result
 > :bulb: If you run out of ideas, check-out the [scripts_s2/diffusion_2D_cuda.jl](scripts_s2/diffusion_2D_cuda.jl) script and try replacing the `??` by some more valid content.
 
 ### Channel flow in 2D
+The final step of this slot is to turn the diffusion script into a channel flow script with free-surface.
+
+![channel flow](./docs/model_setup.png)
+
+We consider the shear-driven Stokes flow with power-law rheology in quasi-2D setup:
+$$ \frac{\partial \tau_{xy}}{\partial y} + \frac{\tau_{xz}}{\partial z} + \rho g\sin\alpha = 0 \\[10pt]
+    \tau_{ij} = 2\eta e_{ij} \\[10pt]
+    \eta = ke_{II}^{n-1} $$
 
 ## Slot 3
 **Hands-on II**
