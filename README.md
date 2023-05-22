@@ -218,8 +218,17 @@ D = d0 .* ones(...)
 ## Slot 4
 **OPTION 1**
 ### AD tools in Julia
+Julia has a rich suport for differential programming. With the power of tools like Enzyme.jl it is possible to compute the derivatives of arbitrary Julia code, including the code targeting GPUs.
 
 ### JVP calculations
+One of the main building blocks in many optimization algorithms involves computing the jacobian-vector product (JVP). AD tools simplify evaluating JVPs by generating the code automatically given the target function.
+
+```julia
+f(x) = sin(x)
+
+∇f(x) = Enzyme.autodiff(f, Active(x))
+```
+
 
 ### Advanced
 #### Towards sensitivity kernels and adjoint solutions
