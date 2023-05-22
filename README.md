@@ -284,7 +284,7 @@ $$ \tau_{ij} = 2\eta ϵ_{ij} $$
 
 $$ \eta = ke_{II}^{n-1} $$ 
 
-Modify the diffusion script turn it into a free-surface channel floe.
+Modify the diffusion script turn it into a free-surface channel flow. To this end, the flux become the viscous stresses $τ_{ij}$, $\rho g\sin\alpha$ needs to be added as source term to the flux balance equation, and the diffusion coefficient becomes the nonlinear viscosity $η$.
 
 ## Slot 3
 **Hands-on II**
