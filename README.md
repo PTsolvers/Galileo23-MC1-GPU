@@ -233,7 +233,7 @@ function update_q!()
 end
 ```
 
-The `Threads.@threads` in front of the outer loop allows for shared memory parallelisation on the CPU (aka [multi-threading]()) if Julia is launched with more than one thread.
+The `Threads.@threads` in front of the outer loop allows for shared memory parallelisation on the CPU (aka [multi-threading](https://docs.julialang.org/en/v1/manual/multi-threading/)) if Julia is launched with more than one thread.
 
 Perform the similar tasks for `update_C!` function.
 
@@ -242,7 +242,7 @@ Also, replace the averaging helper functions my macros, and use macros as well t
 > :bulb: If you run out of ideas, check-out the [scripts_s2/diffusion_2D_fun.jl](scripts_s2/diffusion_2D_fun.jl) script and try replacing the `??` by some more valid content.
 
 ### Solving  transient 2D diffusion on GPU
-let's now move to GPU computing. Starting from the [diffusion_2D_fun.jl]() script you just finalised, we'll make it ready for GPU execution.
+Let's now move to GPU computing. Starting from the [diffusion_2D_fun.jl](scripts_s2/diffusion_2D_fun.jl) script you just finalised, we'll make it ready for GPU execution.
 
 First, we need to modify the compute functions (or kernels hereafter) to replace the spatial loops by 2D vectorised indices that will parallelise the execution over many GPU threads:
 ```julia
@@ -258,7 +258,7 @@ Then, in the `# numerics` section, we need to define some kernel launch paramete
 nthreads = (16, 16)
 nblocks  = cld.((ny, nz), nthreads)
 ```
-You'll find more details about GPU kernel programming in the [CUDA.jl]() documentation or on [this course website]().
+You'll find more details about GPU kernel programming in the [CUDA.jl](https://github.com/JuliaGPU/CUDA.jl) documentation or on [this course website](https://pde-on-gpu.vaw.ethz.ch).
 
 In the `# init` section, we will have now to specify that the arrays should be "uploaded" to the GPU. The `C` init can be wrapped by `CuArray()`. The fluxes and `D` array can be initialised on the GPU by adding `CUDA.` before `ones` or `zeros`. Also, one needs to specify the arithmetic precision as we want to perform double precision `Float64` computations, e.g., `CUDA.zeros(Float64, nx, ny)`.
 
