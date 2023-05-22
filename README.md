@@ -277,6 +277,7 @@ The final step of this slot is to turn the diffusion script into a channel flow 
 ![channel flow](./docs/model_setup.png)
 
 We consider the shear-driven Stokes flow with power-law rheology in a quasi-2D setup:
+
 $$ \frac{\partial \tau_{xy}}{\partial y} + \frac{\tau_{xz}}{\partial z} + \rho g\sin\alpha = 0 $$
 
 $$ \tau_{ij} = 2\eta ϵ_{ij} $$
