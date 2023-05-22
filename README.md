@@ -241,7 +241,7 @@ Also, replace the averaging helper functions my macros, and use macros as well t
 
 > :bulb: If you run out of ideas, check-out the [scripts_s2/diffusion_2D_fun.jl](scripts_s2/diffusion_2D_fun.jl) script and try replacing the `??` by some more valid content.
 
-### Solving  transient 2D diffusion on GPU
+### Solving transient 2D diffusion on GPU
 Let's now move to GPU computing. Starting from the [diffusion_2D_fun.jl](scripts_s2/diffusion_2D_fun.jl) script you just finalised, we'll make it ready for GPU execution.
 
 First, we need to modify the compute functions (or kernels hereafter) to replace the spatial loops by 2D vectorised indices that will parallelise the execution over many GPU threads:
@@ -278,8 +278,10 @@ The final step of this slot is to turn the diffusion script into a channel flow 
 
 We consider the shear-driven Stokes flow with power-law rheology in quasi-2D setup:
 $$ \frac{\partial \tau_{xy}}{\partial y} + \frac{\tau_{xz}}{\partial z} + \rho g\sin\alpha = 0 \\[10pt]
-    \tau_{ij} = 2\eta e_{ij} \\[10pt]
-    \eta = ke_{II}^{n-1} $$
+\tau_{ij} = 2\eta ϵ_{ij} \\[10pt]
+\eta = ke_{II}^{n-1} $$
+
+Modify the 
 
 ## Slot 3
 **Hands-on II**
