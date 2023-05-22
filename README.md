@@ -86,17 +86,17 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
     julia> MPI.MPI_LIBRARY_VERSION_STRING
     "Open MPI v3.1.4, package: Open MPI root@node01.octopoda Distribution, ident: 3.1.4, repo rev: v3.1.4, Apr 15, 2019\0"
     ```
-10. Let's try now to run some basic plotting scripts within Julia and get the output inlined to VSCode. For this, you need to install the [Julia](https://marketplace.visualstudio.com/items?itemName=julialang.language-julia) extension on the node (as you did already on your laptop) and start julia using the `Command Palette` of VSCode (`>Julia: Start REPL`). Change to the correct directory using the shell mode of julia:
+10. Let's try now to run some basic plotting scripts within Julia and get the output inlined to VSCode. For this, you need to install the [Julia](https://marketplace.visualstudio.com/items?itemName=julialang.language-julia) extension on the node (as you did already on your laptop) and start Julia using the `Command Palette` of VSCode (`>Julia: Start REPL`). Change to the correct directory using the "shell mode" of Julia (by typing `;` in the REPL):
     ```julia-repl
-      shell> cd Galileo23-MC1-GPU/scripts_start/
-      /home/course11/Galileo23-MC1-GPU/scripts_start
+    shell> cd Galileo23-MC1-GPU/scripts_start/
+    /home/courseN/Galileo23-MC1-GPU/scripts_start
     ```
-    In the [scripts_start](scripts_start) folder, run the [scripts_start/visu_2D.jl](scripts_start/visu_2D.jl) script with:
+    In the [scripts_start](scripts_start) folder, run the [scripts_start/visu_2D.jl](scripts_start/visu_2D.jl) script as:
     ```julia-repl
-      julia> include("visu_2D.jl")
+    julia> include("visu_2D.jl")
     ```
     which should produce a heatmap of a Gaussian distribution in 2D.
-11.  Finally, you should at this stage be able to run the following scripts to make sure MPI-based GPU selection and GPU-aware MPI is running as expected in Julia. Exit Julia and go to the [scripts_start](scripts_start) folder:
+11. Finally, you should at this stage be able to run the following scripts to make sure MPI-based GPU selection and GPU-aware MPI is running as expected in Julia. Exit Julia and go to the [scripts_start](scripts_start) folder:
     ```
     cd scripts_start
     ```
@@ -108,7 +108,6 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
     ```
     mpirun -np 4 -mca btl_openib_warn_default_gid_prefix 0 julia --project alltoall_mpi_gpu.jl
     ```
-
 
 If you made it here you should be all set :rocket:
 
