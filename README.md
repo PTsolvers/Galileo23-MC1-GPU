@@ -217,6 +217,8 @@ The diffusion coefficient $D = d_0$ should be defined in all gird points such th
 D = d0 .* ones(...)
 ```
 > :bulb: If you struggle getting started, check-out the [scripts_s2/diffusion_2D.jl](scripts_s2/diffusion_2D.jl) script and try replacing the `??` by some more valid content.
+>
+> The solution script can be found at [scripts_solutions/diffusion_2D_sol.jl](scripts_solutions/diffusion_2D_sol.jl)
 
 ### Solving  transient 2D diffusion on the CPU II
 We will perform one additional step in order to make our code closer to be ready for kernel programming on GPUs.
@@ -245,6 +247,8 @@ Perform the similar tasks for `update_C!` function.
 Also, replace the averaging helper functions my macros, and use macros as well to define helper functions for performing the derivative operations.
 
 > :bulb: If you run out of ideas, check-out the [scripts_s2/diffusion_2D_fun.jl](scripts_s2/diffusion_2D_fun.jl) script and try replacing the `??` by some more valid content.
+>
+> The solution script can be found at [scripts_solutions/diffusion_2D_fun_sol.jl](scripts_solutions/diffusion_2D_fun_sol.jl)
 
 ### Solving transient 2D diffusion on GPU
 Let's now move to GPU computing. Starting from the [diffusion_2D_fun.jl](scripts_s2/diffusion_2D_fun.jl) script you just finalised, we'll make it ready for GPU execution.
@@ -275,6 +279,8 @@ CUDA.@sync @cuda threads=nthreads blocks=nblocks update_q!()
 Finally, one needs to gather back on the host the `C` array for plotting, resulting in calling `Array(C)`.
 
 > :bulb: If you run out of ideas, check-out the [scripts_s2/diffusion_2D_cuda.jl](scripts_s2/diffusion_2D_cuda.jl) script and try replacing the `??` by some more valid content.
+>
+> The solution script can be found at [scripts_solutions/diffusion_2D_cuda_sol.jl](scripts_solutions/diffusion_2D_cuda_sol.jl)
 
 ### Channel flow in 2D
 The final step is to now turn the diffusion script into a channel flow script with non-linear viscosity and a free-surface.
@@ -381,6 +387,8 @@ Running the code should produce a figure similar to:
 ![channel flow](./docs/channel_flow.png)
 
 > :bulb: If you run out of ideas, check-out the [scripts_s2/channel_flow_2D.jl](scripts_s2/channel_flow_2D.jl) script and try replacing the `??` by some more valid content.
+> 
+> The solution script can be found at [scripts_solutions/channel_flow_2D_sol.jl](scripts_solutions/channel_flow_2D_sol.jl)
 
 In a second step, create now a GPU code titled `channel_flow_2D_cuda.jl` out of the channel flow script using kernel programming. Apply the same workflow as done for the diffusion codes.
 
@@ -392,7 +400,9 @@ update_v!()
 apply_bc!()
 ```
 
-> :bulb: If you run out of ideas, check-out the [scripts_s2/channel_flow_2D_cuda.jl](scripts_s2/channel_flow_2D_cuda.jl) script and try replacing the `??` by some more valid content.
+> :bulb: If you run out of ideas, check-out the [scripts_s2/channel_flow_2D_cuda.jl](scripts_s2/channel_flow_2D_cuda.jl) script and try replacing the `??` by some more valid content. 
+> 
+> The solution script can be found at [scripts_solutions/channel_flow_2D_cuda_sol.jl](scripts_solutions/channel_flow_2D_cuda_sol.jl)
 
 ## Slot 3
 **Hands-on II**
@@ -400,7 +410,7 @@ apply_bc!()
 We will now port the single process codes we developed in the previous step to use distributed memory parallelisation using MPI.
 
 ### Multi-CPU diffusion solver
-In a first step, we will port the CPU-based diffusion solver to MPI. To examplify the apporoach, let's have a look at the [scripts_s3/diffusion_2D_mpi.jl](scripts_s3/diffusion_2D_mpi.jl) script, which implements non-blocking task-based asynchronous MPI halo exchange.
+In a first step, we will port the CPU-based diffusion solver to MPI. To exemplify the approach, let's have a look at the [scripts_s3/diffusion_2D_mpi.jl](scripts_s3/diffusion_2D_mpi.jl) script, which implements non-blocking task-based asynchronous MPI halo exchange.
 
 We provide the following functions `cooperative_wait`, `cooperative_mpi_wait`, `exchange_halo!` and `gather!` but won't spend much time on what's going in there. In the code, we in addition need initialise MPI and prepare the Cartesian topology to use:
 ```julia
@@ -455,13 +465,22 @@ To debug, you can run the MPI script from within the Julia REPL; for this you ne
 mpirun -np 4 -mca btl_openib_warn_default_gid_prefix 0 julia --project diffusion_2D_mpi.jl
 ```
 
+If this runs, you have now a Julia code the runs on distributed memory parallelisation!
+
 ### Multi-GPU diffusion solver
+The cool thing with Julia is that porting the previous CPU-based code to GPU is fairly straight-forward. The only thing to do is to make arrays and send/receive buffers GPU arrays/vectors.
+
+You can either start from the previous CPU-MPI code and add the GPU specific bits, or start from the GPU diffusion code and add the MPI bits.
+
+> :bulb: Note that if you are running out of ideas, you can always look up the solution code [scripts_solutions/diffusion_2D_mpi_cuda_sol.jl](scripts_solutions/diffusion_2D_mpi_cuda_sol.jl)
 
 ### Multi-GPU channel flow
+Now that you made it for the Julia GPU MPI implementation for the diffusion equation in 2D, you could implement the channel flow with MPI by analogy.
+
 ## Slot 4
 **OPTION 1**
 ### AD tools in Julia
-[Automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) (AD) allows evaluating the gradients of functions specified by code. Using AD, the partial derivatives are evaluated by repeatedly applying the chain rule of differentiation to the sequence of elementary arithetic operations constituting a computer program.
+[Automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) (AD) allows evaluating the gradients of functions specified by code. Using AD, the partial derivatives are evaluated by repeatedly applying the chain rule of differentiation to the sequence of elementary arithmetic operations constituting a computer program.
 
 > :bulb: Many constructs in computer programs aren't differentiable, for example, I/O calls or system calls. AD tools must handle such cases.
 
@@ -503,9 +522,9 @@ function residual!(R,C,dc,dx)
 end
 ```
 
-This function mutates it's argument `R`, storing the result of computing the residual in-place. Also, this function is vector-valued, and returns a vector as well. Information about partial derivatives of such functions is describred by its [Jacobian matrix](https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant).
+This function mutates it's argument `R`, storing the result of computing the residual in-place. Also, this function is vector-valued, and returns a vector as well. Information about partial derivatives of such functions is described by its [Jacobian matrix](https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant).
 
-In [reverse mode](https://enzyme.mit.edu/julia/stable/generated/autodiff/#Reverse-mode) of derivative accumulation, also known as _backpropagation_, one call to Enzyme computes the product of transposed Jacobian matrix and a vector, known as VJP (vector-jacobian product).
+In [reverse mode](https://enzyme.mit.edu/julia/stable/generated/autodiff/#Reverse-mode) of derivative accumulation, also known as _backpropagation_, one call to Enzyme computes the product of transposed Jacobian matrix and a vector, known as VJP (vector-Jacobian product).
 
 To propagate the gradient information, extra storage is needed to store the vector, and the computed derivatives.
 
@@ -526,7 +545,7 @@ $$
 
 Starting from the [scripts_s4/diffusion_1D_enzyme.jl](scripts_s4/diffusion_1D_enzyme.jl), implement the multiple-kernels version of residual evaluation, by replacing the ?? symbols with some meaningful content.
 
-If the residual funciton is a GPU kernel, the syntax is a little bit different:
+If the residual function is a GPU kernel, the syntax is a little bit different:
 
 ```julia
 function grad_residual!(R̄,C̄,R,C,dc,dx)
