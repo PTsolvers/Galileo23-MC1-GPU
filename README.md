@@ -199,7 +199,7 @@ Why?
 Now it's time to get started. In the coming 2 hours, we will program a 2D transientdiffusion equation in a vectorised fashion in Julia. Then, we will turn it into a multi-threaded loop version, and finally into a GPU code. The last part will consist of modifying the diffusion code to solve the channel flow in 2D with free-surface and variable viscosity.
 
 ### Solving transient 2D diffusion on the CPU I
-Starting from the [scripts_start/visu_2D.jl](scripts_start/visu_2D.jl) script, we will add diffusion physics:
+Starting from the [scripts_start/visu_2D.jl](scripts_start/visu_2D.jl) script, create a new script `diffusion_2D.jl` where we will add diffusion physics:
 $$ \frac{∂C}{∂t} = -∇⋅q~, $$
 
 $$ q = -D~∇C ~,$$
@@ -220,7 +220,7 @@ We will here isolate the lines that perform the actual computations, i.e., solve
 
 > :bulb: Note the exclamation mark `!` in the function name. This is a Julia convention if the function modifies the arguments passed to it.
 
-Use the following template for the compute functions:
+Create a new script, `diffusion_2D_fun.jl`, where you will use the following template for the compute functions:
 ```julia
 function update_q!()
     Threads.@threads for iz = 1:size(C, 2)
@@ -244,7 +244,7 @@ Also, replace the averaging helper functions my macros, and use macros as well t
 ### Solving transient 2D diffusion on GPU
 Let's now move to GPU computing. Starting from the [diffusion_2D_fun.jl](scripts_s2/diffusion_2D_fun.jl) script you just finalised, we'll make it ready for GPU execution.
 
-First, we need to modify the compute functions (or kernels hereafter) to replace the spatial loops by 2D vectorised indices that will parallelise the execution over many GPU threads:
+In a new script `diffusion_2D_cuda.jl`, we first need to modify the compute functions (or kernels hereafter) to replace the spatial loops by 2D vectorised indices that will parallelise the execution over many GPU threads:
 ```julia
 function update_q!()
     iy = (blockIdx().x - 1) * blockDim().x + threadIdx().x
@@ -272,7 +272,7 @@ Finally, one needs to gather back on the host the `C` array for plotting, result
 > :bulb: If you run out of ideas, check-out the [scripts_s2/diffusion_2D_cuda.jl](scripts_s2/diffusion_2D_cuda.jl) script and try replacing the `??` by some more valid content.
 
 ### Channel flow in 2D
-The final step of this slot is to turn the diffusion script into a channel flow script with free-surface.
+The final step is to now turn the diffusion script into a channel flow script with non-linear viscosity and a free-surface.
 
 ![channel flow](./docs/model_setup.png)
 
@@ -282,9 +282,70 @@ $$ \frac{\partial \tau_{xy}}{\partial y} + \frac{\tau_{xz}}{\partial z} + \rho g
 
 $$ \tau_{ij} = 2\eta ϵ_{ij} $$
 
-$$ \eta = ke_{II}^{n-1} $$ 
+$$ \eta = k e_\mathrm{II}^{n-1} $$ 
 
-Modify the diffusion script turn it into a free-surface channel flow. To this end, the flux become the viscous stresses $τ_{ij}$, $\rho g\sin\alpha$ needs to be added as source term to the flux balance equation, and the diffusion coefficient becomes the nonlinear viscosity $η$.
+Modify the diffusion script turn it into a free-surface channel flow. To this end, following changes are necessary:
+- the flux become the viscous stresses $τ_{ij}$
+- $\rho g\sin\alpha$ needs to be added as source term to the flux balance equation
+- the diffusion coefficient $D$ turns now into the nonlinear viscosity $η$.
+
+To proceed, start from the `diffusion_2D_fun.jl` script from [this previous step](#solving-transient-2d-diffusion-on-the-cpu-i) and make sure the new physics is correctlxy implemented. In a second step, we will then port it to GPU kernel programming.
+
+Start a new script titled `channel_flow_2D.jl` or start from the provided [scripts_s2/channel_flow_2D.jl](scripts_s2/channel_flow_2D.jl) script. There, we introduce some new physics parameters:
+```julia
+# physics
+# non-dimensional
+npow    = 1.0 / 3.0
+sinα    = sin(π / 12)
+# dimensionally independent
+ly, lz  = 1.0, 1.0 # [m]
+k0      = 1.0      # [Pa*s^npow]
+ρg      = 1.0      # [Pa/m]
+# scales
+psc     = ρg * lz
+ηsc     = psc * (k0 / psc)^(1.0 / npow)
+# dimensionally dependent
+ηreg    = 1e4 * ηsc
+```
+namely, power-law exponant `npow`, slope angle `sinα`, consistency factor `k0`, gravity acceleration `ρg` and some scaling relations.
+
+Then we need some additional numerics parameters:
+```julia
+# numerics
+ϵtol    = 1e-6
+ηrel    = 5e-1
+maxiter = 20000max(ny, nz)
+ncheck  = 500max(ny, nz)
+```
+namely, the nonlinear tolerence `ϵtol`, some relaxation for the viscosity continuation `ηrel`, and a modification of the iteration parameter definition.
+
+In the `# init` section, rename `C` as `vx`, `D` as `ηeff`, `qy` as `τxy` and `qz` as `τxz`.
+
+From the equations, we see that the nonlinear viscosity $\eta$ is function of the second strain-rate invariant $e_\mathrm{II}$ at a given power. You can implement `eII` as a macro in the code:
+```julia
+macro eII() esc(:(sqrt.((avz(diff(vx, dims=1) ./ dy)) .^ 2 .+ (avy(diff(vx, dims=2) ./ dz)) .^ 2))) end
+```
+
+For the boundary condition, enforce no-slip condition at the bottom and open-box at the top. This can be achieved as following:
+```julia
+vx[:, end] .= vx[:, end-1]
+vx[1, :]   .= vx[2, :]
+```
+
+Make finally sure to update the error checking and plotting as well:
+```julia
+if iter % ncheck == 0
+    err = maximum(abs.(diff(τxy, dims=1) ./ dy .+ diff(τxz, dims=2) ./ dz .+ ρg * sinα)) * lz / psc
+    push!(iters_evo, iter / nz); push!(errs_evo, err)
+    p1 = heatmap(yc, zc, vx'; aspect_ratio=1, xlabel="y", ylabel="z", title="Vx", xlims=(-ly / 2, ly / 2), ylims=(0, lz), c=:turbo, right_margin=10mm)
+    p2 = heatmap(yv, zv, ηeff'; aspect_ratio=1, xlabel="y", ylabel="z", title="ηeff", xlims=(-ly / 2, ly / 2), ylims=(0, lz), c=:turbo, colorbar_scale=:log10)
+    p3 = plot(iters_evo, errs_evo; xlabel="niter/nx", ylabel="err", yscale=:log10, framestyle=:box, legend=false, markershape=:circle)
+    display(plot(p1, p2, p3; size=(1200, 400), layout=(1, 3), bottom_margin=10mm, left_margin=10mm))
+    @printf("  #iter/nz=%.1f, err=%1.3e\n", iter / nz, err)
+end
+```
+
+> :bulb: If you run out of ideas, check-out the [scripts_s2/channel_flow_2D.jl](scripts_s2/channel_flow_2D.jl) script and try replacing the `??` by some more valid content.
 
 ## Slot 3
 **Hands-on II**
