@@ -282,11 +282,11 @@ The final step is to now turn the diffusion script into a channel flow script wi
 
 We consider the shear-driven Stokes flow with power-law rheology in a quasi-2D setup:
 
-$$ \frac{\partial \tau_{xy}}{\partial y} + \frac{\tau_{xz}}{\partial z} + \rho g\sin\alpha = 0 $$
+$$ \frac{\partial \tau_{xy}}{\partial y} + \frac{\partial\tau_{xz}}{\partial z} + \rho g\sin\alpha = 0 $$
 
-$$ \tau_{ij} = 2\eta ϵ_{ij} $$
+$$ \tau_{ij} = 2\eta \varepsilon_{ij} $$
 
-$$ \eta = k e_\mathrm{II}^{n-1} $$ 
+$$ \eta = k \varepsilon_\mathrm{II}^{n-1} $$ 
 
 Modify the diffusion script turn it into a free-surface channel flow. To this end, following changes are necessary:
 - the flux become the viscous stresses $τ_{ij}$
@@ -384,8 +384,8 @@ Automatic differentiation is a key ingredient of [_differentiable programming_](
 
 Julia has a rich support for differential programming. With the power of tools like [Enzyme.jl](https://enzyme.mit.edu/julia/stable/) it is possible to automatically compute the derivatives of arbitrary Julia code, including the code targeting GPUs. 
 
-### JVP calculations
-One of the main building blocks in many optimization algorithms involves computing the jacobian-vector product (JVP). AD tools simplify evaluating JVPs by generating the code automatically given the target function.
+### VJP calculations
+One of the main building blocks in many optimization algorithms involves computing the vector-jacobian product (JVP). AD tools simplify evaluating JVPs by generating the code automatically given the target function.
 
 Let's familiarise with [Enzyme.jl](https://enzyme.mit.edu/julia/stable/), the Julia package for performing AD.
 
@@ -396,15 +396,63 @@ Let's start with a simple example:
 ```julia
 julia> using Enzyme
 
-julia> f(x) = sin(x)
+julia> f(ω,x) = sin(ω*x)
 f (generic function with 1 method)
 
-julia> ∇f(x) = Enzyme.autodiff(Reverse,f,Active,Active(x))[1][1]
+julia> ∇f(ω,x) = Enzyme.autodiff(Reverse,f,Active,Const(ω),Active(x))[1][2]
 ∇f (generic function with 1 method)
 
-julia> @assert ∇f(float(π)) ≈ cos(π)
+julia> @assert ∇f(π,1.0) ≈ π*cos(π)
 
 ```
+
+In this line: `∇f(x) = Enzyme.autodiff(Reverse,f,Active,Active(x))[1][1]`, we call `Enzyme.autodiff` function, which computes the partial derivatives. We pass `Reverse` as a first argument, which means that we use the reverse mode of accumulation (see below). We mark the arguments as either `Const` or `Active` to specify which partial derivatives are computed.
+
+Let's make more advanced example, differentiating the vector-valued function. We'll use the 1D residual function for the steady-state diffusion:
+
+```julia
+function residual!(R,C,dc,dx)
+    for ix in 2:length(R)-1
+        R[ix] = dc*(C[ix-1] - 2.0 * C[ix] + C[ix+1])/dx^2
+    end
+end
+```
+
+This function mutates it's argument `R`, storing the result of computing the residual in-place. Also, this function is vector-valued, and returns a vector as well. Information about partial derivatives of such functions is describred by its [Jacobian matrix](https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant).
+
+In [reverse mode](https://enzyme.mit.edu/julia/stable/generated/autodiff/#Reverse-mode) of derivative accumulation, also known as _backpropagation_, one call to Enzyme computes the product of transposed Jacobian matrix and a vector, known as VJP (vector-jacobian product).
+
+To propagate the gradient information, extra storage is needed to store the vector, and the computed derivatives.
+
+```julia
+function grad_residual!(R̄,C̄,R,C,dc,dx)
+    Enzyme.autodiff(Reverse,residual!,Duplicated(R,R̄),Duplicated(C,C̄),Const(dc),Const(dx))
+    return
+end
+```
+
+Here, we introduced the new parameter activity type, `Duplicated`. The first element of `Duplicated` argument takes the value of a variable, and the second the _adjoint_.
+
+> :bulb: Note that we call `autodiff_deferred` instead of `autodiff`.
+
+Often the residual computation is split in several functions, or kernels. In that case, the simplest solution is to manually apply the chain rule (better alternative involves defining [custom rules](https://enzyme.mit.edu/julia/stable/generated/custom_rule/), which is out of scope for this tutorial):
+
+$$
+\left(\frac{\partial R(q(C))}{\partial C}\right)^\mathrm{T} = \left(\frac{\partial R(q)}{\partial q} \frac{\partial q(C)}{\partial C}\right)^\mathrm{T} = \left(\frac{\partial R(q)}{\partial q}\right)^\mathrm{T} \left(\frac{\partial q(C)}{\partial C}\right)^\mathrm{T}
+$$
+
+Starting from the [scripts_s4/diffusion_1D_enzyme.jl](scripts_s4/diffusion_1D_enzyme.jl), implement the multiple-kernels version of residual evaluation, by replacing the ?? symbols with some meaningful content.
+
+If the residual funciton is a GPU kernel, the syntax is a little bit different:
+
+```julia
+function grad_residual!(R̄,C̄,R,C,dc,dx)
+    Enzyme.autodiff_deferred(Reverse,residual!,Duplicated(R,R̄),Duplicated(C,C̄),Const(dc),Const(dx))
+    return
+end
+```
+
+Try to port the 1D diffusion code with Enzyme to GPU, use the [scripts_s4/diffusion_1D_enzyme_cuda.jl](scripts_s4/diffusion_1D_enzyme_cuda.jl) as a starting point.
 
 ### Advanced
 #### Towards sensitivity kernels and adjoint solutions
