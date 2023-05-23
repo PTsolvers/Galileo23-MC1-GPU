@@ -5,6 +5,9 @@
 #### Master class on GPU HPC for the exascale era in geosciences
 
 _by Ludovic Räss and Ivan Utkin (ETH Zurich)_
+
+:eyes: **ATTENTION:** The content was just updated, make sure to `git pull` before getting started!
+
 ## Program
 | Slot    | Program |
 | :-----  | :----- |
@@ -321,7 +324,7 @@ ncheck  = 500max(ny, nz)
 ```
 namely, the nonlinear tolerence `ϵtol`, some relaxation for the viscosity continuation `ηrel`, and a modification of the iteration parameter definition.
 
-In the `# init` section, rename `C` as `vx`, `D` as `ηeff`, `qy` as `τxy` and `qz` as `τxz`.
+In the `# init` section, rename `C` as `vx`, `D` as `ηeff`, `qy` as `τxy` and `qz` as `τxz`. Also, no longer need to initialise `C` now `vx` with a Gaussian; simply use zeros.
 
 From the equations, we see that the nonlinear viscosity $\eta$ is function of the second strain-rate invariant $e_\mathrm{II}$ at a given power. You can implement `eII` as a macro in the code:
 ```julia
@@ -346,8 +349,15 @@ if iter % ncheck == 0
     @printf("  #iter/nz=%.1f, err=%1.3e\n", iter / nz, err)
 end
 ```
+Running the code should produce a figure similar to
+
+![channel flow](./docs/channel_flow.png)
 
 > :bulb: If you run out of ideas, check-out the [scripts_s2/channel_flow_2D.jl](scripts_s2/channel_flow_2D.jl) script and try replacing the `??` by some more valid content.
+
+In a second step, create now a GPU code titled `channel_flow_2D_cuda.jl` out of the channel flow script using kernel programming. Apply the same workflow as done for the diffusion codes.
+
+> :bulb: If you run out of ideas, check-out the [scripts_s2/channel_flow_2D_cuda.jl](scripts_s2/channel_flow_2D_cuda.jl) script and try replacing the `??` by some more valid content.
 
 ## Slot 3
 **Hands-on II**
