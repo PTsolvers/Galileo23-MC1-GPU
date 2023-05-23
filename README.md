@@ -357,6 +357,14 @@ Running the code should produce a figure similar to:
 
 In a second step, create now a GPU code titled `channel_flow_2D_cuda.jl` out of the channel flow script using kernel programming. Apply the same workflow as done for the diffusion codes.
 
+On the GPU, we now need 4 kernels to avoid sync issues and ensure correct execution:
+```julia
+update_ηeff!()
+update_τ!()
+update_v!()
+apply_bc!()
+```
+
 > :bulb: If you run out of ideas, check-out the [scripts_s2/channel_flow_2D_cuda.jl](scripts_s2/channel_flow_2D_cuda.jl) script and try replacing the `??` by some more valid content.
 
 ## Slot 3
