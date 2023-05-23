@@ -482,7 +482,17 @@ $$
 Solving for $\frac{\mathrm{d}v}{\mathrm{d}\eta}$ and plugging into the sensitivity kernel, we obtain:
 
 $$
-\frac{\mathrm{d}J\left(v(η)\right)}{\mathrm{d}η} = -\frac{\partial J\left(v(η)\right)}{\partial v} \left(\frac{\partial R}{\partial v}\right)^(-1) \frac{\partial R}{\partial\eta}
+\frac{\mathrm{d}J\left(v(η)\right)}{\mathrm{d}η} = -\frac{\partial J\left(v(η)\right)}{\partial v} \left(\frac{\partial R}{\partial v}\right)^{-1} \frac{\partial R}{\partial\eta}
+$$
+
+Directly inverting the matrix $\frac{\partial R}{\partial v}$ is prohibitibvely expensive, but instead we can use the temporary variable, called the _adjoint state_:
+
+$$
+\left(\frac{\partial R}{\partial v}\right)^\mathrm{T}\Psi = \frac{\partial J}{\partial v}
+$$
+
+$$
+\frac{\mathrm{d}J}{\mathrm{d}\eta} = -\Psi^\mathrm{T}\frac{\partial R}{\partial\eta}
 $$
 
 #### The accelerated pseudo-transient method
