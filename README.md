@@ -284,7 +284,7 @@ We consider the shear-driven Stokes flow with power-law rheology in a quasi-2D s
 
 $$ \frac{\partial \tau_{xy}}{\partial y} + \frac{\partial\tau_{xz}}{\partial z} + \rho g\sin\alpha = 0 $$
 
-$$ \tau_{ij} = 2\eta \varepsilon_{ij}, \quad \eta_{ij} = \frac{1}{2}\left(\frac{\partial v_i}{\partial x_j} + \frac{\partial v_j}{\partial x_i} \right) $$
+$$ \tau_{ij} = 2\eta \varepsilon_{ij}, \quad \varepsilon_{ij} = \frac{1}{2}\left(\frac{\partial v_i}{\partial x_j} + \frac{\partial v_j}{\partial x_i} \right) $$
 
 $$ \eta = k \varepsilon_\mathrm{II}^{n-1} $$ 
 
