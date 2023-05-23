@@ -612,5 +612,3 @@ To integrate this system in pseudo-time, we need to iteratively apply the transp
 Extend the 2D channel flow example with the VJP calculation with an iterative loop to update the adjoint variable `v̄` using the same approach as the original problem.
 
 > :bulb: Note that in this particular case, $\frac{\partial J}{\partial v}$ = 1
-
-#### The accelerated pseudo-transient method
