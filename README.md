@@ -294,7 +294,7 @@ Modify the diffusion script turn it into a free-surface channel flow. To this en
 - $\rho g\sin\alpha$ needs to be added as source term to the flux balance equation
 - the diffusion coefficient $D$ turns now into the nonlinear viscosity $η$.
 
-To proceed, start from the `diffusion_2D_fun.jl` script from [this previous step](#solving-transient-2d-diffusion-on-the-cpu-i) and make sure the new physics is correctlxy implemented. In a second step, we will then port it to GPU kernel programming.
+To proceed, start from the `diffusion_2D_fun.jl` script from [this previous step](#solving-transient-2d-diffusion-on-the-cpu-i) and make sure the new physics is correctly implemented. In a second step, we will then port it to GPU kernel programming.
 
 Start a new script titled `channel_flow_2D.jl` or start from the provided [scripts_s2/channel_flow_2D.jl](scripts_s2/channel_flow_2D.jl) script. There, we introduce some new physics parameters:
 ```julia
@@ -312,7 +312,7 @@ psc     = ρg * lz
 # dimensionally dependent
 ηreg    = 1e4 * ηsc
 ```
-namely, power-law exponant `npow`, slope angle `sinα`, consistency factor `k0`, gravity acceleration `ρg` and some scaling relations.
+namely, power-law exponent `npow`, slope angle `sinα`, consistency factor `k0`, gravity acceleration `ρg` and some scaling relations.
 
 Then we need some additional numerics parameters:
 ```julia
@@ -322,7 +322,7 @@ Then we need some additional numerics parameters:
 maxiter = 20000max(ny, nz)
 ncheck  = 500max(ny, nz)
 ```
-namely, the nonlinear tolerence `ϵtol`, some relaxation for the viscosity continuation `ηrel`, and a modification of the iteration parameter definition.
+namely, the nonlinear tolerance `ϵtol`, some relaxation for the viscosity continuation `ηrel`, and a modification of the iteration parameter definition.
 
 In the `# init` section, rename `C` as `vx`, `D` as `ηeff`, `qy` as `τxy` and `qz` as `τxz`. Also, no longer need to initialise `C` now `vx` with a Gaussian; simply use zeros.
 
@@ -349,7 +349,7 @@ if iter % ncheck == 0
     @printf("  #iter/nz=%.1f, err=%1.3e\n", iter / nz, err)
 end
 ```
-Running the code should produce a figure similar to
+Running the code should produce a figure similar to:
 
 ![channel flow](./docs/channel_flow.png)
 
@@ -369,7 +369,7 @@ In a second step, create now a GPU code titled `channel_flow_2D_cuda.jl` out of 
 ## Slot 4
 **OPTION 1**
 ### AD tools in Julia
-Julia has a rich suport for differential programming. With the power of tools like Enzyme.jl it is possible to compute the derivatives of arbitrary Julia code, including the code targeting GPUs.
+Julia has a rich support for differential programming. With the power of tools like Enzyme.jl it is possible to compute the derivatives of arbitrary Julia code, including the code targeting GPUs.
 
 ### JVP calculations
 One of the main building blocks in many optimization algorithms involves computing the jacobian-vector product (JVP). AD tools simplify evaluating JVPs by generating the code automatically given the target function.
