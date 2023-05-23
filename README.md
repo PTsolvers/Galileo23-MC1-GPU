@@ -362,10 +362,23 @@ Julia has a rich suport for differential programming. With the power of tools li
 ### JVP calculations
 One of the main building blocks in many optimization algorithms involves computing the jacobian-vector product (JVP). AD tools simplify evaluating JVPs by generating the code automatically given the target function.
 
-```julia
-f(x) = sin(x)
+Let's familiarise with [Enzyme.jl](https://enzyme.mit.edu/julia/stable/), the Julia package for performing AD.
 
-∇f(x) = Enzyme.autodiff(f, Active(x))
+> There are many other Julia packages for performing AD, e.g., [Zygote.jl](https://fluxml.ai/Zygote.jl/stable/). In this tutorial, we use Enzyme as it supports some features currently missing in other packages, e.g., differentiating mutating functions and GPU kernels.
+
+Let's start with a simple example:
+
+```julia
+julia> using Enzyme
+
+julia> f(x) = sin(x)
+f (generic function with 1 method)
+
+julia> ∇f(x) = Enzyme.autodiff(Reverse,f,Active,Active(x))[1][1]
+∇f (generic function with 1 method)
+
+julia> @assert ∇f(float(π)) ≈ cos(π)
+
 ```
 
 
