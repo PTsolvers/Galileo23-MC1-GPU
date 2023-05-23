@@ -473,10 +473,16 @@ $$
 \frac{\mathrm{d}J\left(v(η)\right)}{\mathrm{d}η} = \frac{\partial J\left(v(η)\right)}{\partial v} \frac{\mathrm{d}v}{\mathrm{d}\eta}
 $$
 
-The tricky term to evaluate is the derivative of the solution to the problem w.r.t. the solution, $\frac{\mathrm{d}v}{\mathrm{d}\eta}$. To compute this derivative, we use the fact that at the steady state the residual of the right-hand side of the system of the equations reaches it's minimum. Taking the derivative of the residual with respect to the viscosity $\eta$ and plugging in the chain rule, we obtain:
+The tricky term to evaluate is the derivative of the solution to the problem w.r.t. the solution, $\frac{\mathrm{d}v}{\mathrm{d}\eta}$. To compute this derivative, we use the fact that at the steady state the residual of the right-hand side of the system of the equations reaches it's minimum. Taking the derivative of the residual with respect to the viscosity $\eta$ and using the chain rule again, we obtain:
 
 $$
-\frac{\mathrm{d}R}{\mathrm{d}\eta} = \frac{\mathrm{d}R}{\mathrm{d}\eta} \frac{\mathrm{d}R}{\mathrm{d}\eta}
+\frac{\mathrm{d}R}{\mathrm{d}\eta} = \frac{\partial R}{\partial v} \frac{\mathrm{d}v}{\mathrm{d}\eta} + \frac{\partial R}{\partial\eta} = 0
+$$
+
+Solving for $\frac{\mathrm{d}v}{\mathrm{d}\eta}$ and plugging into the sensitivity kernel, we obtain:
+
+$$
+\frac{\mathrm{d}J\left(v(η)\right)}{\mathrm{d}η} = -\frac{\partial J\left(v(η)\right)}{\partial v} \left(\frac{\partial R}{\partial v}\right)^(-1) \frac{\partial R}{\partial\eta}
 $$
 
 #### The accelerated pseudo-transient method
