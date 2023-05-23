@@ -284,7 +284,7 @@ We consider the shear-driven Stokes flow with power-law rheology in a quasi-2D s
 
 $$ \frac{\partial \tau_{xy}}{\partial y} + \frac{\partial\tau_{xz}}{\partial z} + \rho g\sin\alpha = 0 $$
 
-$$ \tau_{ij} = 2\eta \varepsilon_{ij} $$
+$$ \tau_{ij} = 2\eta \varepsilon_{ij}, \quad \eta_{ij} = \frac{1}{2}\left(\frac{\partial v_i}{\partial x_j} + \frac{\partial v_j}{\partial x_i} \right) $$
 
 $$ \eta = k \varepsilon_\mathrm{II}^{n-1} $$ 
 
@@ -452,9 +452,31 @@ function grad_residual!(R̄,C̄,R,C,dc,dx)
 end
 ```
 
-Try to port the 1D diffusion code with Enzyme to GPU, use the [scripts_s4/diffusion_1D_enzyme_cuda.jl](scripts_s4/diffusion_1D_enzyme_cuda.jl) as a starting point.
+Try to port the 1D diffusion code with Enzyme to GPU. Use the [scripts_s4/diffusion_1D_enzyme_cuda.jl](scripts_s4/diffusion_1D_enzyme_cuda.jl) as a starting point.
+
+Apply the knowledge to differentiate the residual of the 2D channel flow problem. Use the [scripts_s4/channel_flow_2D_enzyme_cuda.jl](scripts_s4/channel_flow_2D_enzyme_cuda.jl) as a starting point.
 
 ### Advanced
 #### Towards sensitivity kernels and adjoint solutions
+
+Now, as we know how to compute VJPs using Enzyme, it's time to use the knowledge to compute the sensitivity of the solution, i.e., the velocity, to the steady channel flow problem with respect to changes in effective viscosity.
+
+To quantify the sensitivity, we need to define some metric. We will use the sensitivity kernel definition from [Reuber 2021](https://link.springer.com/article/10.1007/s13137-021-00186-y), which defines the sensitivity kernel as the derivative of the following function with respect to the parameter of interest:
+
+$$
+J(v) = \int v
+$$
+
+To evaluate the derivative, we can use the chain rule:
+
+$$
+\frac{\mathrm{d}J\left(v(η)\right)}{\mathrm{d}η} = \frac{\partial J\left(v(η)\right)}{\partial v} \frac{\mathrm{d}v}{\mathrm{d}\eta}
+$$
+
+The tricky term to evaluate is the derivative of the solution to the problem w.r.t. the solution, $\frac{\mathrm{d}v}{\mathrm{d}\eta}$. To compute this derivative, we use the fact that at the steady state the residual of the right-hand side of the system of the equations reaches it's minimum. Taking the derivative of the residual with respect to the viscosity $\eta$ and plugging in the chain rule, we obtain:
+
+$$
+\frac{\mathrm{d}R}{\mathrm{d}\eta} = \frac{\mathrm{d}R}{\mathrm{d}\eta} \frac{\mathrm{d}R}{\mathrm{d}\eta}
+$$
 
 #### The accelerated pseudo-transient method
