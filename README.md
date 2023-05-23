@@ -438,7 +438,7 @@ Here, we introduced the new parameter activity type, `Duplicated`. The first ele
 Often the residual computation is split in several functions, or kernels. In that case, the simplest solution is to manually apply the chain rule (better alternative involves defining [custom rules](https://enzyme.mit.edu/julia/stable/generated/custom_rule/), which is out of scope for this tutorial):
 
 $$
-\left(\frac{\partial R(q(C))}{\partial C}\right)^\mathrm{T} = \left(\frac{\partial R(q)}{\partial q} \frac{\partial q(C)}{\partial C}\right)^\mathrm{T} = \left(\frac{\partial R(q)}{\partial q}\right)^\mathrm{T} \left(\frac{\partial q(C)}{\partial C}\right)^\mathrm{T}
+\left[\frac{\partial R(q(C))}{\partial C}\right]^\mathrm{T} = \left[\frac{\partial R(q)}{\partial q} \frac{\partial q(C)}{\partial C}\right]^\mathrm{T} = \left[\frac{\partial R(q)}{\partial q}\right]^\mathrm{T} \left[\frac{\partial q(C)}{\partial C}\right]^\mathrm{T}
 $$
 
 Starting from the [scripts_s4/diffusion_1D_enzyme.jl](scripts_s4/diffusion_1D_enzyme.jl), implement the multiple-kernels version of residual evaluation, by replacing the ?? symbols with some meaningful content.
