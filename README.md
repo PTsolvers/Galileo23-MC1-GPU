@@ -467,6 +467,8 @@ mpirun -np 4 -mca btl_openib_warn_default_gid_prefix 0 julia --project diffusion
 
 If this runs, you have now a Julia code the runs on distributed memory parallelisation!
 
+> :bulb: Additional resources and exercises to familiarise with MPI halo exchange concepts for staggered grids can be found in [this course material](https://pde-on-gpu.vaw.ethz.ch/lecture8/#distributed_computing_in_julia). 
+
 ### Multi-GPU diffusion solver
 The cool thing with Julia is that porting the previous CPU-based code to GPU is fairly straight-forward. The only thing to do is to make arrays and send/receive buffers GPU arrays/vectors.
 
