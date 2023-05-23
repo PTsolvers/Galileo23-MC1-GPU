@@ -200,9 +200,11 @@ Now it's time to get started. In the coming 2 hours, we will program a 2D transi
 
 ### Solving transient 2D diffusion on the CPU I
 Starting from the [scripts_start/visu_2D.jl](scripts_start/visu_2D.jl) script, create a new script `diffusion_2D.jl` where we will add diffusion physics:
+
 $$ \frac{∂C}{∂t} = -∇⋅q~, $$
 
-$$ q = -D~∇C ~,$$
+$$ q = -D~∇C ~, $$
+
 where $D$ is the diffusion coefficient.
 
 Let's use a simple explicit forward Euler time-stepping scheme and keep the same Gaussian distribution as initial condition.
@@ -380,6 +382,7 @@ julia> ∇f(x) = Enzyme.autodiff(Reverse,f,Active,Active(x))[1][1]
 julia> @assert ∇f(float(π)) ≈ cos(π)
 
 ```
+
 
 
 ### Advanced
