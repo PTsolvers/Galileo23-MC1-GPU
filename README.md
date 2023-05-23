@@ -34,7 +34,7 @@ This section provides directions on getting your GPU HPC dev environment ready o
 
 In the following, we will give directions on how to use [VSCode](https://code.visualstudio.com) and the [Remote-SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) extension to access the compute resources. However, feel free to access the resources using your preferred SSH setup.
 
-1. Download [VSCode](https://code.visualstudio.com/download) on your laptop.
+1. Download [VSCode](https://code.visualstudio.com/download) and [Julia](https://julialang.org/downloads/) on your laptop.
 2. Install the [Remote-SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh) and [Julia](https://marketplace.visualstudio.com/items?itemName=julialang.language-julia) extensions by clicking the `Extensions` button on the left side of VSCode.
 3. Retrieve your **confidential** login credentials from the email you received titled "MC1 login credentials", namely your username `<username>` (in the format `courseXX`) and dedicated compute node ID `<nodeID>` (in the format `nodeXX`).
 4. Setup a password-less SSH config to access `octopus` (see e.g. [here](https://linuxize.com/post/how-to-setup-passwordless-ssh-login/) on "how-to"). Ideally, use `ed25519` encryption.
@@ -58,11 +58,10 @@ In the following, we will give directions on how to use [VSCode](https://code.vi
     ```
     $cd Galileo23-MC1-GPU
     ```
-7. Load the Julia, CUDA and MPI modules:
+7. Launch Julia using the `Command Palette` of VSCode `>Julia: Start REPL`. Note that the following modules got loaded automatically:
     ```
     module load julia cuda/11.4 openmpi/gcc83-314-c112
     ```
-    and launch Julia typing `julia`.
 8. In Julia, type `]` to enter the "package-mode". There, activate the current project and resolve the packages we will need typing:
     ```julia-repl
     (@v1.9) pkg> activate .
