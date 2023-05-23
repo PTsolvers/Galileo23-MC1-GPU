@@ -114,12 +114,7 @@ end
     r        = CUDA.zeros(Float64, ny - 2, nz - 2)
     r̄        = CUDA.zeros(Float64, ny - 2, nz - 2)
 
-    # Test computation of VJP
-    CUDA.@sync @cuda threads=nthreads blocks=nblocks grad_residual!(??)
-    CUDA.@sync @cuda threads=nthreads blocks=nblocks grad_update_τ!(??)
-    CUDA.@sync @cuda threads=nthreads blocks=nblocks grad_assign_ηeff!(??)
-
-    # action
+    # action (forward)
     iters_evo = Float64[]; errs_evo = Float64[]; err = 2ϵtol; iter = 1
     while err >= ϵtol && iter <= maxiter
         CUDA.@sync @cuda threads=nthreads blocks=nblocks update_ηeff!(ηeff, vx, k0, npow, ηreg, ηrel, dy, dz)
@@ -138,6 +133,32 @@ end
         end
         iter += 1
     end
+
+    # action (inverse)
+
+    iters_evo = Float64[]; errs_evo = Float64[]; err = 2ϵtol; iter = 1
+    while err >= ϵtol && iter <= maxiter
+        τ̄xy  .= 0.0
+        τ̄xz  .= 0.0
+        η̄eff .= 0.0
+
+        CUDA.@sync @cuda threads=nthreads blocks=nblocks grad_residual!(??)
+        CUDA.@sync @cuda threads=nthreads blocks=nblocks grad_update_τ!(??)
+        CUDA.@sync @cuda threads=nthreads blocks=nblocks grad_assign_ηeff!(??)
+        CUDA.@sync @cuda threads=nthreads blocks=nblocks apply_bc!(v̄x)
+        if iter % ncheck == 0
+            CUDA.@sync @cuda threads=nthreads blocks=nblocks residual!(r, τxy, τxz, ρg, sinα, dy, dz)
+            err = maximum(abs.(r)) * lz / psc
+            push!(iters_evo, iter / nz); push!(errs_evo, err)
+            p1 = heatmap(yc, zc, Array(vx)'; aspect_ratio=1, xlabel="y", ylabel="z", title="Vx", xlims=(-ly / 2, ly / 2), ylims=(0, lz), c=:turbo, right_margin=10mm)
+            p2 = heatmap(yv, zv, Array(ηeff)'; aspect_ratio=1, xlabel="y", ylabel="z", title="ηeff", xlims=(-ly / 2, ly / 2), ylims=(0, lz), c=:turbo, colorbar_scale=:log10)
+            p3 = plot(iters_evo, errs_evo; xlabel="niter/nx", ylabel="err", yscale=:log10, framestyle=:box, legend=false, markershape=:circle)
+            display(plot(p1, p2, p3; size=(1200, 400), layout=(1, 3), bottom_margin=10mm, left_margin=10mm))
+            @printf("  #iter/nz=%.1f, err=%1.3e\n", iter / nz, err)
+        end
+        iter += 1
+    end
+
     return
 end
 

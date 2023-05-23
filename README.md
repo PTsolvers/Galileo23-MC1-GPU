@@ -433,8 +433,6 @@ end
 
 Here, we introduced the new parameter activity type, `Duplicated`. The first element of `Duplicated` argument takes the value of a variable, and the second the _adjoint_.
 
-> :bulb: Note that we call `autodiff_deferred` instead of `autodiff`.
-
 Often the residual computation is split in several functions, or kernels. In that case, the simplest solution is to manually apply the chain rule (better alternative involves defining [custom rules](https://enzyme.mit.edu/julia/stable/generated/custom_rule/), which is out of scope for this tutorial):
 
 $$
@@ -451,6 +449,8 @@ function grad_residual!(R̄,C̄,R,C,dc,dx)
     return
 end
 ```
+
+> :bulb: Note that we call `autodiff_deferred` instead of `autodiff`.
 
 Try to port the 1D diffusion code with Enzyme to GPU. Use the [scripts_s4/diffusion_1D_enzyme_cuda.jl](scripts_s4/diffusion_1D_enzyme_cuda.jl) as a starting point.
 
@@ -494,5 +494,17 @@ $$
 $$
 \frac{\mathrm{d}J}{\mathrm{d}\eta} = -\Psi^\mathrm{T}\frac{\partial R}{\partial\eta}
 $$
+
+In this way, we can compute the point-wise sensitivity in only one additional linear solve. To solve the system of equations $\left(\frac{\partial R}{\partial v}\right)^\mathrm{T}\Psi = \frac{\partial J}{\partial v}$, we can use the same pseudo-transient method that we employed for the forward problem:
+
+$$
+\frac{\partial\Psi}{\partial\tau} + \left(\frac{\partial R}{\partial v}\right)^\mathrm{T}\Psi = \frac{\partial J}{\partial v}
+$$
+
+To integrate this system in pseudo-time, we need to iteratively apply the transposed jacobian to the adjoint state variable vector. And this is exactly what is computed using the AD!
+
+Extend the 2D channel flow example with the VJP calculation with an iterative loop to update the adjoint variable `v̄` using the same approach as the original problem.
+
+> :bulb: note that in this particular case, $\frac{\partial J}{\partial v}$ = 1
 
 #### The accelerated pseudo-transient method
