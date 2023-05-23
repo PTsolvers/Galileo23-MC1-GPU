@@ -29,7 +29,7 @@ function assign_ηeff!(ηeff, vx, k0, npow, ηreg, dy, dz)
 end
 
 function grad_assign_ηeff!(η̄eff,v̄x,ηeff, vx, k0, npow, ηreg, dy, dz)
-    Enzyme.autodiff_deferred(Reverse,assign_ηeff!,Duplicated(ηeff,η̄eff),Duplicated(vx,v̄x),Const(k0),Const(npow),Const(ηreg),Const(dy),Const(dz))
+    Enzyme.autodiff_deferred(Reverse,assign_ηeff!,??)
     return
 end
 
@@ -41,8 +41,8 @@ function update_τ!(ηeff, τxy, τxz, vx, dy, dz)
     return
 end
 
-function grad_update_τ!(τ̄xy, τ̄xz, η̄eff, v̄x, ηeff, τxy, τxz, vx, dy, dz)
-    Enzyme.autodiff_deferred(Reverse,update_τ!,Duplicated(ηeff,η̄eff),Duplicated(τxy,τ̄xy),Duplicated(τxz,τ̄xz),Duplicated(vx,v̄x),Const(dy),Const(dz))
+function grad_update_τ!(??)
+    Enzyme.autodiff_deferred(Reverse,update_τ!,??)
     return
 end
 
@@ -68,8 +68,8 @@ function residual!(resv, τxy, τxz, ρg, sinα, dy, dz)
     return
 end
 
-function grad_residual!(r̄, τ̄xy, τ̄xz, r, τxy, τxz, ρg, sinα, dy, dz)
-    Enzyme.autodiff_deferred(Reverse,residual!,Duplicated(r,r̄),Duplicated(τxy,τ̄xy),Duplicated(τxz,τ̄xz),Const(ρg),Const(sinα),Const(dy),Const(dz))
+function grad_residual!(??)
+    Enzyme.autodiff_deferred(Reverse,residual!,??)
     return
 end
 
@@ -104,10 +104,21 @@ end
     dτ      = cfl * min(dy, dz)^2
     # init
     vx       = CUDA.zeros(Float64, ny, nz)
+    v̄x       = CUDA.zeros(Float64, ny, nz)
     ηeff     = CUDA.zeros(Float64, ny - 1, nz - 1)
+    η̄eff     = CUDA.zeros(Float64, ny - 1, nz - 1)
     τxy      = CUDA.zeros(Float64, ny - 1, nz - 2)
     τxz      = CUDA.zeros(Float64, ny - 2, nz - 1)
-    resv     = CUDA.zeros(Float64, ny - 2, nz - 2)
+    τ̄xy      = CUDA.zeros(Float64, ny - 1, nz - 2)
+    τ̄xz      = CUDA.zeros(Float64, ny - 2, nz - 1)
+    r        = CUDA.zeros(Float64, ny - 2, nz - 2)
+    r̄        = CUDA.zeros(Float64, ny - 2, nz - 2)
+
+    # Test computation of VJP
+    CUDA.@sync @cuda threads=nthreads blocks=nblocks grad_residual!(??)
+    CUDA.@sync @cuda threads=nthreads blocks=nblocks grad_update_τ!(??)
+    CUDA.@sync @cuda threads=nthreads blocks=nblocks grad_assign_ηeff!(??)
+
     # action
     iters_evo = Float64[]; errs_evo = Float64[]; err = 2ϵtol; iter = 1
     while err >= ϵtol && iter <= maxiter
@@ -116,8 +127,8 @@ end
         CUDA.@sync @cuda threads=nthreads blocks=nblocks update_v!(vx, τxy, τxz, ηeff, ρg, sinα, dτ, dy, dz)
         CUDA.@sync @cuda threads=nthreads blocks=nblocks apply_bc!(vx)
         if iter % ncheck == 0
-            CUDA.@sync @cuda threads=nthreads blocks=nblocks residual!(resv, τxy, τxz, ρg, sinα, dy, dz)
-            err = maximum(abs.(resv)) * lz / psc
+            CUDA.@sync @cuda threads=nthreads blocks=nblocks residual!(r, τxy, τxz, ρg, sinα, dy, dz)
+            err = maximum(abs.(r)) * lz / psc
             push!(iters_evo, iter / nz); push!(errs_evo, err)
             p1 = heatmap(yc, zc, Array(vx)'; aspect_ratio=1, xlabel="y", ylabel="z", title="Vx", xlims=(-ly / 2, ly / 2), ylims=(0, lz), c=:turbo, right_margin=10mm)
             p2 = heatmap(yv, zv, Array(ηeff)'; aspect_ratio=1, xlabel="y", ylabel="z", title="ηeff", xlims=(-ly / 2, ly / 2), ylims=(0, lz), c=:turbo, colorbar_scale=:log10)
