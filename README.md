@@ -359,7 +359,13 @@ end
 ## Slot 4
 **OPTION 1**
 ### AD tools in Julia
-Julia has a rich suport for differential programming. With the power of tools like Enzyme.jl it is possible to compute the derivatives of arbitrary Julia code, including the code targeting GPUs.
+[Automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) (AD) allows evaluating the gradients of functions specified by code. Using AD, the partial derivatives are evaluated by repeatedly applying the chain rule of differentiation to the sequence of elementary arithetic operations constituting a computer program.
+
+> Many constructs in computer programs aren't differentiable, for example, I/O calls or system calls. AD tools must handle such cases.
+
+Automatic differentiation is a key ingredient of [_differentiable programming_](https://en.wikipedia.org/wiki/Differentiable_programming), a programming paradigm enabling gradient-based optimisation of the parameters of an arbitrary computer program.
+
+Julia has a rich suport for differential programming. With the power of tools like [Enzyme.jl](https://enzyme.mit.edu/julia/stable/) it is possible to automatically compute the derivatives of arbitrary Julia code, including the code targeting GPUs. 
 
 ### JVP calculations
 One of the main building blocks in many optimization algorithms involves computing the jacobian-vector product (JVP). AD tools simplify evaluating JVPs by generating the code automatically given the target function.
@@ -382,8 +388,6 @@ julia> ∇f(x) = Enzyme.autodiff(Reverse,f,Active,Active(x))[1][1]
 julia> @assert ∇f(float(π)) ≈ cos(π)
 
 ```
-
-
 
 ### Advanced
 #### Towards sensitivity kernels and adjoint solutions
