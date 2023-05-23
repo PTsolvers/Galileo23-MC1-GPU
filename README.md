@@ -198,6 +198,7 @@ Why?
 
 ## Slot 2
 **Hands-on I**
+
 Now it's time to get started. In the coming 2 hours, we will program a 2D transientdiffusion equation in a vectorised fashion in Julia. Then, we will turn it into a multi-threaded loop version, and finally into a GPU code. The last part will consist of modifying the diffusion code to solve the channel flow in 2D with free-surface and variable viscosity.
 
 ### Solving transient 2D diffusion on the CPU I
@@ -395,7 +396,64 @@ apply_bc!()
 
 ## Slot 3
 **Hands-on II**
+
+We will now port the single process codes we developed in the previous step to use distributed memory parallelisation using MPI.
+
 ### Multi-CPU diffusion solver
+In a first step, we will port the CPU-based diffusion solver to MPI. To examplify the apporoach, let's have a look at the [scripts_s3/diffusion_2D_mpi.jl](scripts_s3/diffusion_2D_mpi.jl) script, which implements non-blocking task-based asynchronous MPI halo exchange.
+
+We provide the following functions `cooperative_wait`, `cooperative_mpi_wait`, `exchange_halo!` and `gather!` but won't spend much time on what's going in there. In the code, we in addition need initialise MPI and prepare the Cartesian topology to use:
+```julia
+MPI.Init()
+# create MPI communicator
+comm = MPI.Cart_create(MPI.COMM_WORLD, dims)
+me = MPI.Comm_rank(comm)
+neighbors = ntuple(Val(length(dims))) do idim
+    MPI.Cart_shift(comm, idim - 1, 1)
+end
+coords = Tuple(MPI.Cart_coords(comm))
+```
+
+Then, we have to define the global number of grid points which takes into account 2 cells of overlap:
+```julia
+ny_g, nz_g = (ny - 2) * dims[1] + 2, (nz - 2) * dims[2] + 2
+```
+
+The initial condition needs also to be handled with care in order to define a Gaussian that would spread over different MPI processes:
+```julia
+# init
+y0, z0  = coords[1] * (ny - 2) * dy, coords[2] * (nz - 2) * dz
+yc      = [y0 + iy * dy + dy / 2 - ly / 2 for iy = 1:ny]
+zc      = [z0 + iz * dz + dz / 2          for iz = 1:nz]
+```
+Note that one now needs to correctly account for some shift in `y0, z0` as function of `coords`.
+
+Nextm MPI send and receive buffers need to be initialised:
+```julia
+# MPI buffers
+send_bufs = [[zeros(nz) for side in 1:2], [zeros(ny) for side in 1:2]]
+recv_bufs = deepcopy(send_bufs)
+```
+
+In the time-loop, we need to call the exchange halo function right after the two comptue kernels to update the internal boundary conditions:
+```julia
+exchange_halo!(C, neighbors, send_bufs, recv_bufs, comm)
+```
+
+For visualisation, we can use the provided `gather!` function in order to collect all sub-arrays into a single global array the process 0 `me == 0` can save to disk.
+```julia
+C_g = me == 0 ? zeros(dims[1] * (ny - 2), dims[2] * (nz - 2)) : nothing
+
+MPI.Barrier(comm)
+gather!(C_g, C[2:end-1, 2:end-1], comm)
+```
+
+As last, one needs to finalise MPI calling `MPI.Finalize()`.
+
+To debug, you can run the MPI script from within the Julia REPL; for this you need to comment `MPI.Init()` and `MPI.Finalize()` from the code as you are only allowed to call them once per Julia session. If you then want to run the diffusion MPI script on multiple processors, you can do so as following:
+```sh
+mpirun -np 4 -mca btl_openib_warn_default_gid_prefix 0 julia --project diffusion_2D_mpi.jl
+```
 
 ### Multi-GPU diffusion solver
 
@@ -405,7 +463,7 @@ apply_bc!()
 ### AD tools in Julia
 [Automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) (AD) allows evaluating the gradients of functions specified by code. Using AD, the partial derivatives are evaluated by repeatedly applying the chain rule of differentiation to the sequence of elementary arithetic operations constituting a computer program.
 
-> Many constructs in computer programs aren't differentiable, for example, I/O calls or system calls. AD tools must handle such cases.
+> :bulb: Many constructs in computer programs aren't differentiable, for example, I/O calls or system calls. AD tools must handle such cases.
 
 Automatic differentiation is a key ingredient of [_differentiable programming_](https://en.wikipedia.org/wiki/Differentiable_programming), a programming paradigm enabling gradient-based optimisation of the parameters of an arbitrary computer program.
 
@@ -416,7 +474,7 @@ One of the main building blocks in many optimization algorithms involves computi
 
 Let's familiarise with [Enzyme.jl](https://enzyme.mit.edu/julia/stable/), the Julia package for performing AD.
 
-> There are many other Julia packages for performing AD, e.g., [Zygote.jl](https://fluxml.ai/Zygote.jl/stable/). In this tutorial, we use Enzyme as it supports some features currently missing in other packages, e.g., differentiating mutating functions and GPU kernels.
+> :bulb: There are many other Julia packages for performing AD, e.g., [Zygote.jl](https://fluxml.ai/Zygote.jl/stable/). In this tutorial, we use Enzyme as it supports some features currently missing in other packages, e.g., differentiating mutating functions and GPU kernels.
 
 Let's start with a simple example:
 
@@ -532,6 +590,6 @@ To integrate this system in pseudo-time, we need to iteratively apply the transp
 
 Extend the 2D channel flow example with the VJP calculation with an iterative loop to update the adjoint variable `v̄` using the same approach as the original problem.
 
-> :bulb: note that in this particular case, $\frac{\partial J}{\partial v}$ = 1
+> :bulb: Note that in this particular case, $\frac{\partial J}{\partial v}$ = 1
 
 #### The accelerated pseudo-transient method
