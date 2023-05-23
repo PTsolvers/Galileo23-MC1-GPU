@@ -286,12 +286,32 @@ $$ \frac{\partial \tau_{xy}}{\partial y} + \frac{\partial\tau_{xz}}{\partial z} 
 
 $$ \tau_{ij} = 2\eta \varepsilon_{ij}, \quad \varepsilon_{ij} = \frac{1}{2}\left(\frac{\partial v_i}{\partial x_j} + \frac{\partial v_j}{\partial x_i} \right) $$
 
-$$ \eta = k \varepsilon_\mathrm{II}^{n-1} $$ 
+$$ \eta = k \varepsilon_\mathrm{II}^{n-1} $$
 
-Modify the diffusion script turn it into a free-surface channel flow. To this end, following changes are necessary:
+Modify the diffusion script to turn it into a free-surface channel flow. To this end, following changes are necessary:
 - the flux become the viscous stresses $τ_{ij}$
+- the quantity $C$ becomes the out-of-plane velocity $v_x$
 - $\rho g\sin\alpha$ needs to be added as source term to the flux balance equation
-- the diffusion coefficient $D$ turns now into the nonlinear viscosity $η$.
+- the diffusion coefficient $D$ turns now into the nonlinear viscosity $η$
+- the force-balance equation can be used to retrieve $v_x$ iteratively.
+
+For the iterative process can be designed as augmenting the force balance equation with a pseudo-time step $\partial τ$ one can then use to reach a steady state:
+
+$$ \frac{\partial \tau_{xy}}{\partial y} + \frac{\partial\tau_{xz}}{\partial z} + \rho g\sin\alpha = \frac{\partial v_x}{\partial τ} ~.$$
+
+We now have a rule to update $v_x$ as function of the residual of the balance equation $\mathrm{R}v_x$:
+
+$$ \mathrm{R}v_x = \frac{\partial \tau_{xy}}{\partial y} + \frac{\partial\tau_{xz}}{\partial z} + \rho g\sin\alpha~,$$
+
+$$ \frac{\partial v_x}{\partial τ} = \mathrm{R}v_x~,$$
+
+such that:
+
+$$ \partial v_x = \partial v_x + \partial τ * \mathrm{R}v_x~.$$
+
+This simple iterations results in a Picrad-like scheme; simple but not ideal in terms of number of iterations to converge to a given tolerance.
+
+> :bulb: This simple "pseudo-transient" scheme can be accelerated by using a second order scheme. This is on-going research. Check out [this lecture](https://pde-on-gpu.vaw.ethz.ch/lecture3/#solving_elliptic_pdes) and [related publication (Räss et al., 2022)](https://gmd.copernicus.org/articles/15/5757/2022/) if curious about it.
 
 To proceed, start from the `diffusion_2D_fun.jl` script from [this previous step](#solving-transient-2d-diffusion-on-the-cpu-i) and make sure the new physics is correctly implemented. In a second step, we will then port it to GPU kernel programming.
 
@@ -325,9 +345,16 @@ namely, the nonlinear tolerance `ϵtol`, some relaxation for the viscosity conti
 
 In the `# init` section, rename `C` as `vx`, `D` as `ηeff`, `qy` as `τxy` and `qz` as `τxz`. Also, no longer need to initialise `C` now `vx` with a Gaussian; simply use zeros.
 
-From the equations, we see that the nonlinear viscosity $\eta$ is function of the second strain-rate invariant $e_\mathrm{II}$ at a given power. You can implement `eII` as a macro in the code:
+From the equations, we see that the nonlinear viscosity $\eta$ is function of the second strain-rate invariant $ɛ_\mathrm{II}$ at a given power. You can implement `eII` as a macro in the code:
 ```julia
 macro eII() esc(:(sqrt.((avz(diff(vx, dims=1) ./ dy)) .^ 2 .+ (avy(diff(vx, dims=2) ./ dz)) .^ 2))) end
+```
+
+Also, we now have to include the `err >= ϵtol` condition in our `while` loop, such that:
+```julia
+while err >= ϵtol && iter <= maxiter
+    # iteration loop
+end
 ```
 
 For the boundary condition, enforce no-slip condition at the bottom and open-box at the top. This can be achieved as following:
